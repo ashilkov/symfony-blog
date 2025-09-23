@@ -39,9 +39,9 @@ This backend follows DDD with two bounded contexts:
   - Blog: blog metadata and ownership
   - Post: articles within a blog
   - BlogUser: relation of users to blogs (roles/collaboration)
-  - Subscription: link between a user and a blog for following
+  - Subscription: a link between a user and a blog for following
 - User Context:
-  - User + Auth: registration, login and profile basics
+  - User + Auth: registration, login, and profile basics
 
 Bounded contexts keep domain models cohesive and enforce clear boundaries between blog features and user/auth concerns.
 
@@ -56,14 +56,14 @@ Bounded contexts keep domain models cohesive and enforce clear boundaries betwee
 
 ## Frontend
 
-Repository: https://github.com/ashilkov/symfony-blog-frontend
+Repository: https://github.com/ashilkov/symfony-blog-frontend </br>
+
 The React (Vite + TS) frontend lives in a separate repository and consumes:
 - REST endpoints for Auth
 - GraphQL endpoint for all other operations
 
 Configure the frontend `.env` with:
-- VITE_API_BASE_URL (for REST)
-- VITE_GRAPHQL_ENDPOINT (for GraphQL, e.g., http://localhost:8000/api/graphql)
+- VITE_API_ENDPOINT
 
 ## Useful Developer Notes
 
