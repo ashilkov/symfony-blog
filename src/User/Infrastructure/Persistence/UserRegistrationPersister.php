@@ -35,7 +35,7 @@ readonly class UserRegistrationPersister implements ProcessorInterface
         $user->setUsername($data->username);
         $user->setFullName($data->fullname);
 
-        $password = $this->passwordHasher->hashPassword($user, $data->plainPassword);
+        $password = $this->passwordHasher->hashPassword($user, $data->password);
         $user->setPassword($password);
 
         $user->addRole(UserRole::ROLE_USER);

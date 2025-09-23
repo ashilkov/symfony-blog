@@ -27,7 +27,7 @@ class UserInput
     #[Assert\NotBlank(groups: ['Registration'])]
     #[Assert\Length(min: 8, max: 4096, groups: ['Registration'])]
     #[Groups(['user:write'])]
-    public ?string $plainPassword = null;
+    public ?string $password = null;
 
     #[Assert\NotBlank(groups: ['Registration'])]
     #[Assert\Length(min: 3, max: 100, groups: ['Registration'])]
