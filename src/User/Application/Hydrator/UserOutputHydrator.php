@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * @author Andrei Shilkov <aishilkov94@gmail.com>
+ * @license MIT
+ *
+ * @see https://github.com/ashilkov/symfony-blog
+ */
+
+namespace App\User\Application\Hydrator;
+
+use App\User\API\DTO\UserOutput;
+use App\User\Domain\Model\User;
+
+class UserOutputHydrator implements UserHydratorInterface
+{
+    public function hydrate(User $user): UserOutput
+    {
+        return new UserOutput(
+            id: $user->getId(),
+            username: $user->getUsername(),
+            email: $user->getEmail(),
+            fullname: $user->getFullName(),
+        );
+    }
+}

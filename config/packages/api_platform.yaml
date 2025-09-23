@@ -1,0 +1,20 @@
+api_platform:
+    title: Hello API Platform
+    version: 1.0.0
+    enable_swagger_ui: true
+    mapping:
+        paths: [
+            '%kernel.project_dir%/src/Entity/',
+            '%kernel.project_dir%/src/Blog/',
+            '%kernel.project_dir%/src/User/'
+        ]
+    formats:
+        json: ['application/json']
+        jsonld: ['application/ld+json']
+    defaults:
+        stateless: true
+        cache_headers:
+            vary: [ 'Content-Type', 'Authorization', 'Origin' ]
+    graphql:
+        graphiql:
+            enabled: true

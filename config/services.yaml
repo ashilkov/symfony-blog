@@ -18,3 +18,13 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\User\API\GraphQL\MeResolver:
+        tags: [ 'api_platform.graphql.resolver' ]
+
+    App\Blog\Infrastructure\ApiPlatform\Extension\BlogUserCurrentUserExtension:
+        tags:
+            - { name: 'api_platform.doctrine.orm.query_extension.collection', priority: 50 }
+
+    App\User\Application\Hydrator\UserHydratorInterface: '@App\User\Application\Hydrator\UserOutputHydrator'
+
+
