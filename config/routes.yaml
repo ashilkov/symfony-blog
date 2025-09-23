@@ -1,9 +1,3 @@
-controllers:
-    resource:
-        path: ../src/Blog/UI/Http/Controller/
-        namespace: App\Blog\UI\Http\Controller
-    type: attribute
-
 api_login_check:
     path: /api/login
 
