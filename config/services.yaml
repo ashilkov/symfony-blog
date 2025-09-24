@@ -18,7 +18,11 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # GraphQL Resolvers
     App\User\API\GraphQL\MeResolver:
+        tags: [ 'api_platform.graphql.resolver' ]
+    App\Blog\API\GraphQL\UploadImageResolver:
         tags: [ 'api_platform.graphql.resolver' ]
 
     App\Blog\Infrastructure\ApiPlatform\Extension\BlogUserCurrentUserExtension:

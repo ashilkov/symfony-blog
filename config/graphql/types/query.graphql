@@ -1,4 +1,0 @@
-type Query {
-    posts: [Post]
-    findPost(id: Int): Post
-}
