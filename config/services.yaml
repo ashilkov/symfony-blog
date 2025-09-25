@@ -24,6 +24,14 @@ services:
         tags: [ 'api_platform.graphql.resolver' ]
     App\Blog\API\GraphQL\UploadImageResolver:
         tags: [ 'api_platform.graphql.resolver' ]
+    App\Blog\API\GraphQL\PostGenerateResolver:
+        tags: [ 'api_platform.graphql.resolver' ]
+        bind:
+            string $openAIKey: '%env(OPENAI_API_KEY)%'
+    App\Blog\API\GraphQL\BlogGenerateResolver:
+        tags: [ 'api_platform.graphql.resolver' ]
+        bind:
+            string $openAIKey: '%env(OPENAI_API_KEY)%'
 
     App\Blog\Infrastructure\ApiPlatform\Extension\BlogUserCurrentUserExtension:
         tags:

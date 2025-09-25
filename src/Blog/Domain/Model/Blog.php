@@ -10,6 +10,12 @@
 namespace App\Blog\Domain\Model;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\DeleteMutation;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use App\Blog\API\DTO\BlogResponse;
+use App\Blog\API\GraphQL\BlogGenerateResolver;
 use App\Blog\Infrastructure\Repository\BlogRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -18,10 +24,26 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 
+// todo: move all requests and responses to DTO
 #[ApiResource(
     operations: [],
     normalizationContext: ['groups' => ['blog:read'], 'iri_only' => false, 'enable_max_depth' => true],
-    denormalizationContext: ['groups' => ['blog:write']]
+    denormalizationContext: ['groups' => ['blog:write']],
+    graphQlOperations: [
+        new Query(),
+        new QueryCollection(),
+        new Mutation(name: 'create'),
+        new Mutation(name: 'update'),
+        new DeleteMutation(name: 'delete'),
+        new Query(
+            resolver: BlogGenerateResolver::class,
+            args: ['name' => ['type' => 'String'], 'description' => ['type' => 'String']],
+            description: 'Generate blog information',
+            security: 'is_granted("ROLE_USER")',
+            output: BlogResponse::class,
+            name: 'generate',
+        ),
+    ]
 )]
 #[ORM\Entity(repositoryClass: BlogRepository::class)]
 class Blog

@@ -15,6 +15,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use App\Blog\API\DTO\PostResponse;
+use App\Blog\API\GraphQL\PostGenerateResolver;
 use App\Blog\Application\Processor\PostCreateProcessor;
 use App\Blog\Infrastructure\Repository\PostRepository;
 use App\User\Domain\Model\User;
@@ -23,6 +25,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 
+// todo: move all requests and responses to DTO
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ApiResource(
     operations: [],
@@ -48,6 +51,18 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
             description: 'Get all posts of subscribed blogs',
             security: 'is_granted("ROLE_USER")',
             name: 'subscribed',
+        ),
+        new Query(
+            resolver: PostGenerateResolver::class,
+            args: [
+                'title' => ['type' => 'String'],
+                'content' => ['type' => 'String'],
+                'blogId' => ['type' => 'String!'],
+            ],
+            description: 'Generate post information',
+            security: 'is_granted("ROLE_USER")',
+            output: PostResponse::class,
+            name: 'generate'
         ),
     ]
 )]
