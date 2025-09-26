@@ -9,13 +9,9 @@
 
 namespace App\User\Domain\Model;
 
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Post;
 use App\Blog\Domain\Model\Subscription;
-use App\User\API\DTO\UserInput;
 use App\User\Domain\Enum\UserRole;
-use App\User\Infrastructure\Persistence\UserRegistrationPersister;
-use App\User\Infrastructure\Repository\UserRepository;
+use App\User\Domain\Repository\UserRepositoryInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -23,24 +19,10 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Entity(repositoryClass: UserRepositoryInterface::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[ApiResource(
-    operations: [
-        new Post(
-            uriTemplate: '/users/',
-            description: 'User registration',
-            security: 'is_granted("PUBLIC_ACCESS")',
-            input: UserInput::class,
-            name: 'user_registration',
-            processor: UserRegistrationPersister::class,
-        ),
-    ],
-    normalizationContext: ['groups' => ['user:read']],
-    denormalizationContext: ['groups' => ['user:write']],
-)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -52,7 +34,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(['user:read', 'post:read'])]
     private ?string $username = null;
 
     /**
@@ -68,7 +49,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups('user:read')]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]

@@ -7,7 +7,7 @@
  * @see https://github.com/ashilkov/symfony-blog
  */
 
-namespace App\Blog\API\DTO;
+namespace App\Blog\API\DTO\Response;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;

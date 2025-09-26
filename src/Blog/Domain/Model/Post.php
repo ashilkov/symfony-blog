@@ -9,99 +9,39 @@
 
 namespace App\Blog\Domain\Model;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\GraphQl\Mutation;
-use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Metadata\GraphQl\QueryCollection;
-use App\Blog\API\DTO\PostResponse;
-use App\Blog\API\GraphQL\PostGenerateResolver;
-use App\Blog\Application\Processor\PostCreateProcessor;
-use App\Blog\Infrastructure\Repository\PostRepository;
+use App\Blog\Domain\Repository\PostRepositoryInterface;
 use App\User\Domain\Model\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\MaxDepth;
 
-// todo: move all requests and responses to DTO
-#[ORM\Entity(repositoryClass: PostRepository::class)]
-#[ApiResource(
-    operations: [],
-    normalizationContext: ['groups' => ['post:read'], 'iri_only' => false, 'enable_max_depth' => true],
-    denormalizationContext: ['groups' => ['post:write']],
-    graphQlOperations: [
-        new QueryCollection(),
-        new Query(),
-        new Mutation(
-            securityPostDenormalize: "is_granted('BLOG_CREATE_POST', object)",
-            name: 'create',
-            processor: PostCreateProcessor::class
-        ),
-        new Mutation(
-            security: 'is_granted("BLOG_EDIT_POST", object)',
-            name: 'edit',
-        ),
-        new Mutation(
-            security: 'is_granted("BLOG_DELETE_POST", object)',
-            name: 'delete',
-        ),
-        new QueryCollection(
-            description: 'Get all posts of subscribed blogs',
-            security: 'is_granted("ROLE_USER")',
-            name: 'subscribed',
-        ),
-        new Query(
-            resolver: PostGenerateResolver::class,
-            args: [
-                'title' => ['type' => 'String'],
-                'content' => ['type' => 'String'],
-                'blogId' => ['type' => 'String!'],
-            ],
-            description: 'Generate post information',
-            security: 'is_granted("ROLE_USER")',
-            output: PostResponse::class,
-            name: 'generate'
-        ),
-    ]
-)]
-#[ApiFilter(SearchFilter::class, properties: ['blog.id' => 'exact'])]
+#[ORM\Entity(repositoryClass: PostRepositoryInterface::class)]
 #[ORM\HasLifecycleCallbacks]
 class Post
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('post:read')]
     /**
      * @phpstan-ignore-next-line Doctrine sets the ID at runtime
      */
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['post:read', 'post:write'])]
     private ?string $content = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
-    #[Groups(['post:write', 'post:read'])]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
-    #[Groups(['post:read', 'post:write'])]
-    #[MaxDepth(1)]
     private ?Blog $blog = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['post:read', 'post:write'])]
     private ?string $title = null;
 
     #[ORM\Column]
-    #[Groups(['post:read'])]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column]
-    #[Groups(['post:read'])]
     private ?\DateTimeImmutable $updated_at = null;
 
     public function getId(): ?int

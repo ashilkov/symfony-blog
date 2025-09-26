@@ -9,20 +9,22 @@
 
 namespace App\User\Application\Handler;
 
-use App\User\API\DTO\UserOutput;
+use App\User\API\DTO\Response\UserResponse;
 use App\User\Application\Hydrator\UserHydratorInterface;
-use App\User\Infrastructure\Repository\UserRepository;
+use App\User\Domain\Model\User;
+use App\User\Domain\Repository\UserRepositoryInterface;
 
 readonly class UserInfoHandler
 {
     public function __construct(
-        private UserRepository $userRepository,
+        private UserRepositoryInterface $userRepository,
         private UserHydratorInterface $userOutputHydrator,
     ) {
     }
 
-    public function __invoke(string $identifier): ?UserOutput
+    public function __invoke(string $identifier): ?UserResponse
     {
+        /** @var User $user */
         $user = $this->userRepository->findOneBy(['username' => $identifier]);
         if ($user) {
             return $this->userOutputHydrator->hydrate($user);

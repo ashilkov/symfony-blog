@@ -9,17 +9,11 @@
 
 namespace App\Blog\Domain\Model;
 
-use ApiPlatform\Metadata\ApiResource;
-use App\Blog\Infrastructure\Repository\SubscriptionRepository;
+use App\Blog\Domain\Repository\SubscriptionRepositoryInterface;
 use App\User\Domain\Model\User;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SubscriptionRepository::class)]
-#[ApiResource(
-    operations: [],
-    normalizationContext: ['groups' => ['subscription:read'], 'iri_only' => false],
-    denormalizationContext: ['groups' => ['subscription:write']],
-)]
+#[ORM\Entity(repositoryClass: SubscriptionRepositoryInterface::class)]
 #[ORM\HasLifecycleCallbacks]
 class Subscription
 {

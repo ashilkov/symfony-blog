@@ -7,8 +7,9 @@
  * @see https://github.com/ashilkov/symfony-blog
  */
 
-namespace App\Blog\API\DTO;
+namespace App\Blog\API\DTO\Response;
 
+use App\User\Domain\Model\User;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 class PostResponse
@@ -20,6 +21,11 @@ class PostResponse
         public ?string $title,
         #[Groups(['post:read'])]
         public ?string $content,
+        #[Groups(['post:read'])]
+        public ?User $user,
+        public ?BlogResponse $blog,
+        #[Groups(['post:read'])]
+        public ?string $createdAt,
     ) {
     }
 }

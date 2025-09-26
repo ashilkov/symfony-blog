@@ -7,8 +7,9 @@
  * @see https://github.com/ashilkov/symfony-blog
  */
 
-namespace App\Blog\API\DTO;
+namespace App\Blog\API\DTO\Response;
 
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 class BlogResponse
@@ -20,6 +21,9 @@ class BlogResponse
         public ?string $name,
         #[Groups(['blog:read'])]
         public ?string $description,
+        /** @var Collection<int, PostResponse> */
+        #[Groups(['blog:read'])]
+        public Collection $posts,
     ) {
     }
 }

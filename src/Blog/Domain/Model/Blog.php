@@ -9,76 +9,39 @@
 
 namespace App\Blog\Domain\Model;
 
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\GraphQl\DeleteMutation;
-use ApiPlatform\Metadata\GraphQl\Mutation;
-use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Metadata\GraphQl\QueryCollection;
-use App\Blog\API\DTO\BlogResponse;
-use App\Blog\API\GraphQL\BlogGenerateResolver;
-use App\Blog\Infrastructure\Repository\BlogRepository;
+use App\Blog\Domain\Repository\BlogRepositoryInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\MaxDepth;
 
-// todo: move all requests and responses to DTO
-#[ApiResource(
-    operations: [],
-    normalizationContext: ['groups' => ['blog:read'], 'iri_only' => false, 'enable_max_depth' => true],
-    denormalizationContext: ['groups' => ['blog:write']],
-    graphQlOperations: [
-        new Query(),
-        new QueryCollection(),
-        new Mutation(name: 'create'),
-        new Mutation(name: 'update'),
-        new DeleteMutation(name: 'delete'),
-        new Query(
-            resolver: BlogGenerateResolver::class,
-            args: ['name' => ['type' => 'String'], 'description' => ['type' => 'String']],
-            description: 'Generate blog information',
-            security: 'is_granted("ROLE_USER")',
-            output: BlogResponse::class,
-            name: 'generate',
-        ),
-    ]
-)]
-#[ORM\Entity(repositoryClass: BlogRepository::class)]
+#[ORM\Entity(repositoryClass: BlogRepositoryInterface::class)]
 class Blog
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('blog:read')]
     /**
      * @phpstan-ignore-next-line Doctrine sets the ID at runtime
      */
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['blog:read', 'blog:write', 'post:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['blog:read', 'blog:write'])]
     private ?string $description = null;
 
     /**
      * @var Collection <int, BlogUser>
      */
-    #[ORM\OneToMany(targetEntity: BlogUser::class, mappedBy: 'blog')]
-    #[Groups(['blog:read', 'post:read'])]
-    #[MaxDepth(1)]
+    #[ORM\OneToMany(targetEntity: BlogUser::class, mappedBy: 'blog', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $blogUsers;
 
     /**
      * @var Collection<int, Post>
      */
     #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'blog')]
-    #[Groups(['blog:read'])]
-    #[MaxDepth(1)]
     private Collection $posts;
 
     /**
@@ -135,6 +98,8 @@ class Blog
     {
         if (!$this->blogUsers->contains($blogUser)) {
             $this->blogUsers->add($blogUser);
+            // If you add a setter on BlogUser, you can uncomment the next line
+            // $blogUser->setBlog($this);
         }
 
         return $this;

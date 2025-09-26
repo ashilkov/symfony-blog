@@ -9,8 +9,9 @@
 
 namespace App\Blog\Domain\Security;
 
-use App\Blog\Domain\Model\Blog;
-use App\Blog\Domain\Model\Post;
+
+use App\Blog\API\Resource\Blog;
+use App\Blog\API\Resource\Post;
 use App\User\Domain\Model\User;
 
 interface BlogPermissionPolicyInterface

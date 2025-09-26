@@ -9,7 +9,7 @@
 
 namespace App\Blog\API\GraphQL;
 
-use App\Blog\API\DTO\UploadResult;
+use App\Blog\API\DTO\Response\UploadResult;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 

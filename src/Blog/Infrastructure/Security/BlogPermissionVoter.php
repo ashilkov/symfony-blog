@@ -9,7 +9,7 @@
 
 namespace App\Blog\Infrastructure\Security;
 
-use App\Blog\Domain\Model\Post;
+use App\Blog\API\Resource\Post;
 use App\User\Domain\Model\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -47,7 +47,7 @@ class BlogPermissionVoter extends Voter
         $post = $subject;
 
         return match ($attribute) {
-            self::CREATE_POST => $post->getBlog() && $this->policy->canCreatePost($user, $post->getBlog()),
+            self::CREATE_POST => $post->blog && $this->policy->canCreatePost($user, $post->blog),
             self::EDIT_POST => $this->policy->canEditPost($user, $post),
             self::DELETE_POST => $this->policy->canDeletePost($user, $post),
             default => false,

@@ -9,10 +9,10 @@
 
 namespace App\User\Application\Hydrator;
 
-use App\User\API\DTO\UserOutput;
+use App\User\API\DTO\Response\UserResponse;
 use App\User\Domain\Model\User;
 
 interface UserHydratorInterface
 {
-    public function hydrate(User $user): UserOutput;
+    public function hydrate(User $user): UserResponse;
 }

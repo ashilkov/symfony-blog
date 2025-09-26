@@ -33,6 +33,24 @@ services:
         bind:
             string $openAIKey: '%env(OPENAI_API_KEY)%'
 
+    # Repositories
+    App\Blog\Domain\Repository\PostRepositoryInterface: '@App\Blog\Infrastructure\Repository\PostRepository'
+    App\Blog\Domain\Repository\BlogRepositoryInterface: '@App\Blog\Infrastructure\Repository\BlogRepository'
+    App\Blog\Domain\Repository\BlogUserRepositoryInterface: '@App\Blog\Infrastructure\Repository\BlogUserRepository'
+    App\Blog\Domain\Repository\SubscriptionRepositoryInterface: '@App\Blog\Infrastructure\Repository\SubscriptionRepository'
+    App\User\Domain\Repository\UserRepositoryInterface:
+        class: App\User\Infrastructure\Repository\UserRepository
+        tags: [ 'doctrine.repository_service' ]
+
+
+
+
+    # Providers
+    App\Blog\API\State\Blog\ItemProvider:
+        tags:
+            - { name: 'api_platform.state_provider', priority: 50 }
+
+
     App\Blog\Infrastructure\ApiPlatform\Extension\BlogUserCurrentUserExtension:
         tags:
             - { name: 'api_platform.doctrine.orm.query_extension.collection', priority: 50 }

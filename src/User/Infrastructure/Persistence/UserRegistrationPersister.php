@@ -11,14 +11,14 @@ namespace App\User\Infrastructure\Persistence;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\User\API\DTO\UserInput;
+use App\User\API\DTO\Request\UserRequest;
 use App\User\Domain\Enum\UserRole;
 use App\User\Domain\Model\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
- * @implements ProcessorInterface<UserInput, User>
+ * @implements ProcessorInterface<UserRequest, User>
  */
 readonly class UserRegistrationPersister implements ProcessorInterface
 {

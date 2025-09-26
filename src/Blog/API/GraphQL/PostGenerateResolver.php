@@ -9,13 +9,13 @@
 
 namespace App\Blog\API\GraphQL;
 
-use App\Blog\API\DTO\PostResponse;
-use App\Blog\Infrastructure\Repository\BlogRepository;
+use App\Blog\API\DTO\Response\PostResponse;
+use App\Blog\Domain\Repository\BlogRepositoryInterface;
 
 readonly class PostGenerateResolver extends AbstractGenerateResolver
 {
     public function __construct(
-        private BlogRepository $blogRepository,
+        private BlogRepositoryInterface $blogRepository,
         string $openAIKey,
     ) {
         parent::__construct($openAIKey);

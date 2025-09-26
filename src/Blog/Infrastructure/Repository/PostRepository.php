@@ -10,20 +10,21 @@
 namespace App\Blog\Infrastructure\Repository;
 
 use App\Blog\Domain\Model\Post;
+use App\Blog\Domain\Repository\PostRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Post>
  */
-class PostRepository extends ServiceEntityRepository
+class PostRepository extends ServiceEntityRepository implements PostRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Post::class);
     }
 
-    public function add(Post $entity, bool $flush = false): void
+    public function save(Post $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 

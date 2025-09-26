@@ -16,9 +16,9 @@ use App\Blog\Domain\Model\BlogUser;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\SecurityBundle\Security;
 
-class BlogUserCurrentUserExtension implements QueryCollectionExtensionInterface
+readonly class BlogUserCurrentUserExtension implements QueryCollectionExtensionInterface
 {
-    public function __construct(private readonly Security $security)
+    public function __construct(private Security $security)
     {
     }
 
@@ -29,6 +29,7 @@ class BlogUserCurrentUserExtension implements QueryCollectionExtensionInterface
         ?Operation $operation = null,
         array $context = [],
     ): void {
+
         if (BlogUser::class !== $resourceClass) {
             return;
         }

@@ -7,12 +7,12 @@
  * @see https://github.com/ashilkov/symfony-blog
  */
 
-namespace App\User\API\DTO;
+namespace App\User\API\DTO\Request;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class UserInput
+class UserRequest
 {
     #[Assert\NotBlank(groups: ['Registration'])]
     #[Assert\Email(groups: ['Registration'])]

@@ -10,13 +10,14 @@
 namespace App\Blog\Infrastructure\Repository;
 
 use App\Blog\Domain\Model\BlogUser;
+use App\Blog\Domain\Repository\BlogUserRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<BlogUser>
  */
-class BlogUserRepository extends ServiceEntityRepository
+class BlogUserRepository extends ServiceEntityRepository implements BlogUserRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {

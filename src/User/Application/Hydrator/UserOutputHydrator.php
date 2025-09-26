@@ -9,14 +9,14 @@
 
 namespace App\User\Application\Hydrator;
 
-use App\User\API\DTO\UserOutput;
+use App\User\API\DTO\Response\UserResponse;
 use App\User\Domain\Model\User;
 
 class UserOutputHydrator implements UserHydratorInterface
 {
-    public function hydrate(User $user): UserOutput
+    public function hydrate(User $user): UserResponse
     {
-        return new UserOutput(
+        return new UserResponse(
             id: $user->getId(),
             username: $user->getUsername(),
             email: $user->getEmail(),

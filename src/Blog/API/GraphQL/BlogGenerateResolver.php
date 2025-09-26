@@ -9,7 +9,7 @@
 
 namespace App\Blog\API\GraphQL;
 
-use App\Blog\API\DTO\BlogResponse;
+use App\Blog\API\DTO\Response\BlogResponse;
 
 readonly class BlogGenerateResolver extends AbstractGenerateResolver
 {

@@ -9,15 +9,16 @@
 
 namespace App\Blog\Infrastructure\Security;
 
-use App\Blog\Domain\Model\Blog;
-use App\Blog\Domain\Model\Post;
+
+use App\Blog\API\Resource\Blog;
+use App\Blog\API\Resource\Post;
+use App\Blog\Domain\Repository\BlogUserRepositoryInterface;
 use App\Blog\Domain\Security\BlogPermissionPolicyInterface;
-use App\Blog\Infrastructure\Repository\BlogUserRepository;
 use App\User\Domain\Model\User;
 
 readonly class BlogPermissionPolicy implements BlogPermissionPolicyInterface
 {
-    public function __construct(private BlogUserRepository $blogUserRepository)
+    public function __construct(private BlogUserRepositoryInterface $blogUserRepository)
     {
     }
 
@@ -30,7 +31,7 @@ readonly class BlogPermissionPolicy implements BlogPermissionPolicyInterface
 
     public function canEditPost(User $user, Post $post): bool
     {
-        $blog = $post->getBlog();
+        $blog = $post->blog;
         if (!$blog instanceof Blog) {
             return false;
         }
@@ -41,12 +42,12 @@ readonly class BlogPermissionPolicy implements BlogPermissionPolicyInterface
         }
 
         // Allow authors to edit their own post
-        return $post->getUser()?->getId() === $user->getId();
+        return $post->author?->getId() === $user->getId();
     }
 
     public function canDeletePost(User $user, Post $post): bool
     {
-        $blog = $post->getBlog();
+        $blog = $post->blog;
         if (!$blog instanceof Blog) {
             return false;
         }
@@ -59,8 +60,8 @@ readonly class BlogPermissionPolicy implements BlogPermissionPolicyInterface
     private function getRole(User $user, Blog $blog): ?string
     {
         $blogUser = $this->blogUserRepository->findOneBy([
-            'user' => $user,
-            'blog' => $blog,
+            'user' => $user->getId(),
+            'blog' => $blog->id,
         ]);
 
         return $blogUser?->getRole();

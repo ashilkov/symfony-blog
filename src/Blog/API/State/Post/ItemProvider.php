@@ -1,0 +1,48 @@
+<?php
+/**
+ * @author Andrei Shilkov <aishilkov94@gmail.com>
+ * @license MIT
+ *
+ * @see https://github.com/ashilkov/symfony-blog
+ */
+
+namespace App\Blog\API\State\Post;
+
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
+use App\Blog\API\Hydrator\BlogHydrator;
+use App\Blog\API\Hydrator\PostHydrator;
+use App\Blog\API\Resource\Blog;
+use App\Blog\API\Resource\Post;
+use App\Blog\Domain\Repository\BlogRepositoryInterface;
+use App\Blog\Domain\Repository\PostRepositoryInterface;
+
+class ItemProvider implements ProviderInterface
+{
+    public function __construct(
+        private PostRepositoryInterface $postRepository,
+        private BlogHydrator            $blogHydrator,
+        private PostHydrator            $postHydrator,
+    )
+    {
+    }
+
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): Post|null
+    {
+        $id = $uriVariables['id'] ?? null;
+        if (null === $id) {
+            return null;
+        }
+
+        /** @var \App\Blog\Domain\Model\Post $post */
+        $post = $this->postRepository->findOneBy(['id' => (int)$id]);
+        if (null === $post) {
+            return null;
+        }
+
+        $postResource = $this->postHydrator->hydrate($post);
+        $postResource->blog = $this->blogHydrator->hydrate($post->getBlog());
+
+        return $postResource;
+    }
+}

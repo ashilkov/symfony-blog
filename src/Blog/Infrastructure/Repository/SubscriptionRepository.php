@@ -10,13 +10,14 @@
 namespace App\Blog\Infrastructure\Repository;
 
 use App\Blog\Domain\Model\Subscription;
+use App\Blog\Domain\Repository\SubscriptionRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Subscription>
  */
-class SubscriptionRepository extends ServiceEntityRepository
+class SubscriptionRepository extends ServiceEntityRepository implements SubscriptionRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
