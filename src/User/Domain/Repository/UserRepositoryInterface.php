@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Andrei Shilkov <aishilkov94@gmail.com>
  * @license MIT
@@ -13,5 +14,4 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 interface UserRepositoryInterface extends ServiceEntityRepositoryInterface, PasswordUpgraderInterface
 {
-
 }

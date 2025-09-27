@@ -9,16 +9,14 @@
 
 namespace App\Blog\Domain\Security;
 
-
 use App\Blog\API\Resource\Blog;
 use App\Blog\API\Resource\Post;
-use App\User\Domain\Model\User;
 
 interface BlogPermissionPolicyInterface
 {
-    public function canCreatePost(User $user, Blog $blog): bool;
+    public function canCreatePost(int $userId, Blog $blog): bool;
 
-    public function canEditPost(User $user, Post $post): bool;
+    public function canEditPost(int $userId, Post $post): bool;
 
-    public function canDeletePost(User $user, Post $post): bool;
+    public function canDeletePost(int $userId, Post $post): bool;
 }

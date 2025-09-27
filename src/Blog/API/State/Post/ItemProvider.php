@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Andrei Shilkov <aishilkov94@gmail.com>
  * @license MIT
@@ -12,22 +13,19 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Blog\API\Hydrator\BlogHydrator;
 use App\Blog\API\Hydrator\PostHydrator;
-use App\Blog\API\Resource\Blog;
 use App\Blog\API\Resource\Post;
-use App\Blog\Domain\Repository\BlogRepositoryInterface;
 use App\Blog\Domain\Repository\PostRepositoryInterface;
 
 class ItemProvider implements ProviderInterface
 {
     public function __construct(
         private PostRepositoryInterface $postRepository,
-        private BlogHydrator            $blogHydrator,
-        private PostHydrator            $postHydrator,
-    )
-    {
+        private BlogHydrator $blogHydrator,
+        private PostHydrator $postHydrator,
+    ) {
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): Post|null
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?Post
     {
         $id = $uriVariables['id'] ?? null;
         if (null === $id) {
@@ -35,7 +33,7 @@ class ItemProvider implements ProviderInterface
         }
 
         /** @var \App\Blog\Domain\Model\Post $post */
-        $post = $this->postRepository->findOneBy(['id' => (int)$id]);
+        $post = $this->postRepository->findOneBy(['id' => (int) $id]);
         if (null === $post) {
             return null;
         }

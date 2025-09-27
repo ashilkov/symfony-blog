@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Andrei Shilkov <aishilkov94@gmail.com>
  * @license MIT
@@ -12,5 +13,4 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
 
 interface SubscriptionRepositoryInterface extends ServiceEntityRepositoryInterface
 {
-
 }

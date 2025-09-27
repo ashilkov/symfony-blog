@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Andrei Shilkov <aishilkov94@gmail.com>
  * @license MIT
@@ -16,7 +17,8 @@ class BlogUserHydrator
     public function hydrate(BlogUser $blogUser): BlogUserResource
     {
         return new BlogUserResource(
-            role: $blogUser->getRole()
+            role: $blogUser->getRole(),
+            userId: $blogUser->getUserId(),
         );
     }
 }

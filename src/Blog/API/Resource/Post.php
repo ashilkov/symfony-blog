@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Andrei Shilkov <aishilkov94@gmail.com>
  * @license MIT
@@ -14,12 +15,11 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
-use App\Blog\API\DTO\Response\PostResponse;
+use App\Blog\API\DTO\Response\GeneratedPost;
 use App\Blog\API\GraphQL\PostGenerateResolver;
 use App\Blog\API\State\Post\CollectionProvider;
 use App\Blog\API\State\Post\ItemProvider;
 use App\Blog\Application\Processor\Post\CreateProcessor;
-use App\User\Domain\Model\User;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -58,12 +58,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
             ],
             description: 'Generate post information',
             security: 'is_granted("ROLE_USER")',
-            output: PostResponse::class,
-            name: 'generate'
+            output: GeneratedPost::class,
+            name: 'generate',
         ),
     ]
 )]
-
 class Post
 {
     public function __construct(
@@ -81,8 +80,7 @@ class Post
         #[Groups(['post:read', 'post:write'])]
         public ?Blog $blog = null,
         #[Groups(['post:read'])]
-        public ?User $author = null,
-    )
-    {
+        public ?string $author = null,
+    ) {
     }
 }

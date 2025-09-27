@@ -10,7 +10,6 @@
 namespace App\Blog\Domain\Model;
 
 use App\Blog\Domain\Repository\SubscriptionRepositoryInterface;
-use App\User\Domain\Model\User;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SubscriptionRepositoryInterface::class)]
@@ -28,8 +27,8 @@ class Subscription
     #[ORM\ManyToOne(inversedBy: 'subscriptions')]
     private ?Blog $blog = null;
 
-    #[ORM\ManyToOne(inversedBy: 'subscriptions')]
-    private ?User $subscriber = null;
+    #[ORM\Column(name: 'user_id', type: 'integer', nullable: false)]
+    private ?int $subscriberId = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
@@ -54,14 +53,14 @@ class Subscription
         return $this;
     }
 
-    public function getSubscriber(): ?User
+    public function getSubscriberId(): ?int
     {
-        return $this->subscriber;
+        return $this->subscriberId;
     }
 
-    public function setSubscriber(?User $subscriber): static
+    public function setSubscriberId(?int $subscriberId): static
     {
-        $this->subscriber = $subscriber;
+        $this->subscriberId = $subscriberId;
 
         return $this;
     }

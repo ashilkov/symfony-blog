@@ -10,7 +10,6 @@
 namespace App\Blog\Domain\Model;
 
 use App\Blog\Domain\Repository\PostRepositoryInterface;
-use App\User\Domain\Model\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -29,8 +28,8 @@ class Post
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
-    #[ORM\ManyToOne(inversedBy: 'posts')]
-    private ?User $user = null;
+    #[ORM\Column(name: 'user_id', type: 'integer', nullable: false)]
+    private ?int $userId = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
     private ?Blog $blog = null;
@@ -61,14 +60,14 @@ class Post
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUserId(): ?int
     {
-        return $this->user;
+        return $this->userId;
     }
 
-    public function setUser(?User $user): static
+    public function setUserId(?int $userId): static
     {
-        $this->user = $user;
+        $this->userId = $userId;
 
         return $this;
     }

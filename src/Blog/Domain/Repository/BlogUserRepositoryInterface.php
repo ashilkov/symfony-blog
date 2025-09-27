@@ -6,5 +6,4 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
 
 interface BlogUserRepositoryInterface extends ServiceEntityRepositoryInterface
 {
-
 }

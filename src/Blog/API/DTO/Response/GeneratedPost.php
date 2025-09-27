@@ -9,23 +9,17 @@
 
 namespace App\Blog\API\DTO\Response;
 
-use App\User\Domain\Model\User;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-class PostResponse
+class GeneratedPost
 {
     public function __construct(
+        #[Groups(['blog:read'])]
+        public ?int $id = null,
         #[Groups(['post:read'])]
-        public ?int $id,
+        public ?string $title = null,
         #[Groups(['post:read'])]
-        public ?string $title,
-        #[Groups(['post:read'])]
-        public ?string $content,
-        #[Groups(['post:read'])]
-        public ?User $user,
-        public ?BlogResponse $blog,
-        #[Groups(['post:read'])]
-        public ?string $createdAt,
+        public ?string $content = null,
     ) {
     }
 }

@@ -9,7 +9,6 @@
 
 namespace App\Blog\API\GraphQL;
 
-use App\Blog\Domain\Model\Blog;
 use GraphQL\Type\Definition\ResolveInfo;
 
 abstract readonly class AbstractGenerateResolver
@@ -19,10 +18,10 @@ abstract readonly class AbstractGenerateResolver
     ) {
     }
 
-    public function __invoke(mixed $root, array $args, ?array $context = null, ?ResolveInfo $info = null)
+    public function __invoke(mixed $root, array $args, ?array $context = null, ?ResolveInfo $info = null): object
     {
         $this->validateRequest($args);
-        /** @var Blog $blog */
+
         $client = \OpenAI::client($this->openAIKey);
         $response = $client->responses()->create([
             'model' => 'gpt-5-nano',

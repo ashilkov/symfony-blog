@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Andrei Shilkov <aishilkov94@gmail.com>
  * @license MIT
@@ -8,6 +9,7 @@
 
 namespace App\Blog\API\Resource;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -16,7 +18,7 @@ use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Link;
 use App\Blog\API\State\BlogUser\CollectionProvider as BlogUserCollectionProvider;
 use App\Blog\API\State\BlogUser\ItemProvider as BlogUserItemProvider;
-use App\User\Domain\Model\User;
+use App\Blog\Domain\Enum\BlogUserRole;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -32,7 +34,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             uriTemplate: '/blogs/{blogId}/members/{userId}',
             uriVariables: [
                 'blogId' => new Link(fromProperty: 'blogUsers', fromClass: Blog::class, identifiers: ['id']),
-                'userId' => new Link(fromClass: User::class, identifiers: ['id']),
+                'userId' => new Link(fromProperty: 'userId', fromClass: BlogUser::class, identifiers: ['userId']),
             ],
             provider: BlogUserItemProvider::class
         ),
@@ -45,25 +47,27 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new QueryCollection(
             provider: BlogUserCollectionProvider::class,
-        )
+        ),
     ]
 )]
 class BlogUser
 {
     // Regular fields
+    #[ApiProperty(identifier: true)]
     #[Groups(['blog_user:read'])]
     public ?Blog $blog;
 
+    #[ApiProperty(identifier: true)]
     #[Groups(['blog_user:read'])]
-    public ?User $user;
+    public ?int $userId;
 
     #[Groups(['blog_user:read', 'blog:read'])]
-    public ?string $role;
+    public ?BlogUserRole $role;
 
-    public function __construct(?string $role, ?Blog $blog = null, ?User $user = null, ?string $id = null, ?string $memberId = null)
+    public function __construct(?BlogUserRole $role = null, ?Blog $blog = null, ?int $userId = null)
     {
         $this->blog = $blog;
-        $this->user = $user;
+        $this->userId = $userId;
         $this->role = $role;
     }
 }

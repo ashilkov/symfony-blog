@@ -9,58 +9,73 @@
 
 namespace App\Blog\Infrastructure\Security;
 
-
 use App\Blog\API\Resource\Blog;
 use App\Blog\API\Resource\Post;
+use App\Blog\Domain\Enum\BlogUserRole;
+use App\Blog\Domain\Model\Post as PostDomain;
 use App\Blog\Domain\Repository\BlogUserRepositoryInterface;
+use App\Blog\Domain\Repository\PostRepositoryInterface;
 use App\Blog\Domain\Security\BlogPermissionPolicyInterface;
-use App\User\Domain\Model\User;
 
 readonly class BlogPermissionPolicy implements BlogPermissionPolicyInterface
 {
-    public function __construct(private BlogUserRepositoryInterface $blogUserRepository)
-    {
+    public function __construct(
+        private BlogUserRepositoryInterface $blogUserRepository,
+        private PostRepositoryInterface $postRepository,
+    ) {
     }
 
-    public function canCreatePost(User $user, Blog $blog): bool
+    public function canCreatePost(int $userId, Blog $blog): bool
     {
-        $role = $this->getRole($user, $blog);
+        $role = $this->getRole($userId, $blog);
 
-        return in_array($role, ['ROLE_AUTHOR', 'ROLE_EDITOR', 'ROLE_ADMIN'], true);
+        return in_array($role, [BlogUserRole::ROLE_AUTHOR, BlogUserRole::ROLE_EDITOR, BlogUserRole::ROLE_ADMIN], true);
     }
 
-    public function canEditPost(User $user, Post $post): bool
+    public function canEditPost(int $userId, Post $post): bool
     {
         $blog = $post->blog;
         if (!$blog instanceof Blog) {
             return false;
         }
 
-        $role = $this->getRole($user, $blog);
-        if (\in_array($role, ['ROLE_EDITOR', 'ROLE_ADMIN'], true)) {
+        $role = $this->getRole($userId, $blog);
+        if (\in_array($role, [BlogUserRole::ROLE_EDITOR, BlogUserRole::ROLE_ADMIN], true)) {
             return true;
         }
 
-        // Allow authors to edit their own post
-        return $post->author?->getId() === $user->getId();
+        if (BlogUserRole::ROLE_AUTHOR === $role) {
+            if (null === $post->id) {
+                return false;
+            }
+            /** @var PostDomain $domainPost */
+            $domainPost = $this->postRepository->findOneBy(['id' => $post->id]);
+            if (!$domainPost) {
+                return false;
+            }
+
+            return $domainPost->getUserId() === $userId;
+        }
+
+        return false;
     }
 
-    public function canDeletePost(User $user, Post $post): bool
+    public function canDeletePost(int $userId, Post $post): bool
     {
         $blog = $post->blog;
         if (!$blog instanceof Blog) {
             return false;
         }
 
-        $role = $this->getRole($user, $blog);
+        $role = $this->getRole($userId, $blog);
 
-        return \in_array($role, ['ROLE_EDITOR', 'ROLE_ADMIN'], true);
+        return \in_array($role, [BlogUserRole::ROLE_EDITOR, BlogUserRole::ROLE_ADMIN], true);
     }
 
-    private function getRole(User $user, Blog $blog): ?string
+    private function getRole(int $userId, Blog $blog): ?BlogUserRole
     {
         $blogUser = $this->blogUserRepository->findOneBy([
-            'user' => $user->getId(),
+            'userId' => $userId,
             'blog' => $blog->id,
         ]);
 

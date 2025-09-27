@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Andrei Shilkov <aishilkov94@gmail.com>
  * @license MIT
@@ -20,11 +21,10 @@ readonly class CollectionProvider implements ProviderInterface
 {
     public function __construct(
         private BlogUserRepositoryInterface $blogUserRepository,
-        private BlogHydrator                $blogHydrator,
-        private BlogUserHydrator            $blogUserHydrator,
-        private Security                    $security
-    )
-    {
+        private BlogHydrator $blogHydrator,
+        private BlogUserHydrator $blogUserHydrator,
+        private Security $security,
+    ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
@@ -32,16 +32,20 @@ readonly class CollectionProvider implements ProviderInterface
         $searchRequest = [];
 
         // Resolve pagination from context (defaults if not provided)
-        $page = (int)($context['filters']['page'] ?? 1);
-        $itemsPerPage = (int)($context['filters']['itemsPerPage'] ?? 30);
+        $page = (int) ($context['filters']['page'] ?? 1);
+        $itemsPerPage = (int) ($context['filters']['itemsPerPage'] ?? 30);
         $page = $page > 0 ? $page : 1;
         $itemsPerPage = $itemsPerPage > 0 ? $itemsPerPage : 30;
         $offset = ($page - 1) * $itemsPerPage;
 
-        if (isset($uriVariables['blog_id'])) $searchRequest['blog'] = $uriVariables['blog_id'];
+        if (isset($uriVariables['blog_id'])) {
+            $searchRequest['blog'] = $uriVariables['blog_id'];
+        }
         $userId = $this->security->getUser()?->getId();
-        if (null === $userId) return null;
-        $searchRequest['user'] = $userId;
+        if (null === $userId) {
+            return null;
+        }
+        $searchRequest['userId'] = $userId;
 
         /** @var \App\Blog\Domain\Model\BlogUser|null $blogUser */
         $blogUsers = $this->blogUserRepository->findBy($searchRequest, null, $itemsPerPage, $offset);
@@ -50,7 +54,6 @@ readonly class CollectionProvider implements ProviderInterface
         $items = array_map(function ($blogUser) {
             $blogUserResource = $this->blogUserHydrator->hydrate($blogUser);
             $blogUserResource->blog = $this->blogHydrator->hydrate($blogUser->getBlog());
-            $blogUserResource->user = $blogUser->getUser();
 
             return $blogUserResource;
         }, $blogUsers);

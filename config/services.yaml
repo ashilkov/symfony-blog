@@ -43,18 +43,12 @@ services:
         tags: [ 'doctrine.repository_service' ]
 
 
-
-
-    # Providers
-    App\Blog\API\State\Blog\ItemProvider:
+    # Event Listeners
+    App\Blog\Application\Listener\Blog\BeforeCreateListener:
         tags:
-            - { name: 'api_platform.state_provider', priority: 50 }
+            - { name: doctrine.event_listener, event: 'App\Blog\Domain\Event\Blog\BeforeCreateEvent', method: '__invoke' }
 
-
-    App\Blog\Infrastructure\ApiPlatform\Extension\BlogUserCurrentUserExtension:
-        tags:
-            - { name: 'api_platform.doctrine.orm.query_extension.collection', priority: 50 }
-
+    # Dependency Injection
     App\User\Application\Hydrator\UserHydratorInterface: '@App\User\Application\Hydrator\UserOutputHydrator'
 
 

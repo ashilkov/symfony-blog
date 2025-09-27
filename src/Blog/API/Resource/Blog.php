@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Andrei Shilkov <aishilkov94@gmail.com>
  * @license MIT
@@ -17,7 +18,7 @@ use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Link;
-use App\Blog\API\DTO\Response\BlogResponse;
+use App\Blog\API\DTO\Response\GeneratedBlog;
 use App\Blog\API\GraphQL\BlogGenerateResolver;
 use App\Blog\API\State\Blog\CollectionProvider;
 use App\Blog\API\State\Blog\ItemProvider;
@@ -45,21 +46,20 @@ use Symfony\Component\Serializer\Annotation\Groups;
             args: ['name' => ['type' => 'String'], 'description' => ['type' => 'String']],
             description: 'Generate blog information',
             security: 'is_granted("ROLE_USER")',
-            output: BlogResponse::class,
+            output: GeneratedBlog::class,
             name: 'generate',
+            read: false
         ),
     ],
-
 )]
 class Blog
 {
-
-    /** @var \App\Blog\API\Resource\Post[] */
+    /** @var Post[] */
     #[Groups(['blog:read'])]
     #[ApiProperty(readableLink: true)]
     public array $posts = [];
 
-    /** @var \App\Blog\API\Resource\BlogUser[] */
+    /** @var BlogUser[] */
     #[Groups(['blog:read'])]
     #[ApiProperty(readableLink: true)]
     public array $blogUsers = [];
@@ -67,17 +67,16 @@ class Blog
     public function __construct(
         #[ApiProperty(identifier: true)]
         #[Groups(['blog:read', 'blog_user:read'])]
-        public ?int    $id = null,
+        public ?int $id = null,
         #[Groups(['blog:read', 'post:read', 'blog:write'])]
         public ?string $name = null,
         #[Groups(['blog:read', 'post:read', 'blog:write'])]
         public ?string $description = null,
-        ?array         $blogUsersData = null,
-        ?array         $postsData = null,
+        ?array $blogUsersData = null,
+        ?array $postsData = null,
         #[Groups(['blog:read'])]
-        public array   $subscriptions = [],
-    )
-    {
+        public array $subscriptions = [],
+    ) {
         $this->posts = $postsData ?? [];
         $this->blogUsers = $blogUsersData ?? [];
     }

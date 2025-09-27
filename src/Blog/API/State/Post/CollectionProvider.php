@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Andrei Shilkov <aishilkov94@gmail.com>
  * @license MIT
@@ -19,17 +20,16 @@ readonly class CollectionProvider implements ProviderInterface
 {
     public function __construct(
         private PostRepositoryInterface $postRepository,
-        private BlogHydrator            $blogHydrator,
-        private PostHydrator            $postHydrator,
-    )
-    {
+        private BlogHydrator $blogHydrator,
+        private PostHydrator $postHydrator,
+    ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         // Resolve pagination from context (defaults if not provided)
-        $page = (int)($context['filters']['page'] ?? 1);
-        $itemsPerPage = (int)($context['filters']['itemsPerPage'] ?? 30);
+        $page = (int) ($context['filters']['page'] ?? 1);
+        $itemsPerPage = (int) ($context['filters']['itemsPerPage'] ?? 30);
         $page = $page > 0 ? $page : 1;
         $itemsPerPage = $itemsPerPage > 0 ? $itemsPerPage : 30;
         $offset = ($page - 1) * $itemsPerPage;
@@ -46,7 +46,7 @@ readonly class CollectionProvider implements ProviderInterface
 
         $items = array_map(function ($post) {
             $postResource = $this->postHydrator->hydrate($post);
-            $postResource->blog =  $this->blogHydrator->hydrate($post->getBlog());
+            $postResource->blog = $this->blogHydrator->hydrate($post->getBlog());
 
             return $postResource;
         }, $posts);

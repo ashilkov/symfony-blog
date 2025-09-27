@@ -29,7 +29,6 @@ readonly class BlogUserCurrentUserExtension implements QueryCollectionExtensionI
         ?Operation $operation = null,
         array $context = [],
     ): void {
-
         if (BlogUser::class !== $resourceClass) {
             return;
         }

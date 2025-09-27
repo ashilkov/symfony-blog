@@ -9,7 +9,7 @@
 
 namespace App\Blog\API\GraphQL;
 
-use App\Blog\API\DTO\Response\BlogResponse;
+use App\Blog\API\DTO\Response\GeneratedBlog;
 
 readonly class BlogGenerateResolver extends AbstractGenerateResolver
 {
@@ -32,8 +32,7 @@ readonly class BlogGenerateResolver extends AbstractGenerateResolver
 
     protected function prepareResponse(array $response): object
     {
-        return new BlogResponse(
-            id: null,
+        return new GeneratedBlog(
             name: $response['name'] ?? null,
             description: $response['description'] ?? null,
         );

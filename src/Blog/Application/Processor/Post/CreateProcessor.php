@@ -16,7 +16,6 @@ use App\Blog\API\Resource\Post as PostResource;
 use App\Blog\Domain\Model\Post;
 use App\Blog\Domain\Repository\BlogRepositoryInterface;
 use App\Blog\Domain\Repository\PostRepositoryInterface;
-use App\User\Domain\Model\User;
 use Symfony\Bundle\SecurityBundle\Security;
 
 /**
@@ -24,19 +23,12 @@ use Symfony\Bundle\SecurityBundle\Security;
  */
 readonly class CreateProcessor implements ProcessorInterface
 {
-    /**
-     * @param Security $security
-     * @param PostRepositoryInterface $postRepository
-     * @param BlogRepositoryInterface $blogRepository
-     * @param PostHydrator $postHydrator
-     */
     public function __construct(
-        private Security                $security,
+        private Security $security,
         private PostRepositoryInterface $postRepository,
         private BlogRepositoryInterface $blogRepository,
-        private PostHydrator            $postHydrator
-    )
-    {
+        private PostHydrator $postHydrator,
+    ) {
     }
 
     /**
@@ -59,8 +51,8 @@ readonly class CreateProcessor implements ProcessorInterface
         }
 
         $user = $this->security->getUser();
-        if ($user instanceof User) {
-            $post->setUser($user);
+        if ($user?->getId()) {
+            $post->setUserId($user->getId());
         }
 
         $this->postRepository->save($post, true);

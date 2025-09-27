@@ -9,7 +9,7 @@
 
 namespace App\Blog\API\GraphQL;
 
-use App\Blog\API\DTO\Response\PostResponse;
+use App\Blog\API\DTO\Response\GeneratedPost;
 use App\Blog\Domain\Repository\BlogRepositoryInterface;
 
 readonly class PostGenerateResolver extends AbstractGenerateResolver
@@ -44,8 +44,7 @@ readonly class PostGenerateResolver extends AbstractGenerateResolver
 
     protected function prepareResponse(array $response): object
     {
-        return new PostResponse(
-            id: null,
+        return new GeneratedPost(
             title: $response['title'] ?? null,
             content: $response['content'] ?? null,
         );

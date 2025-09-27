@@ -9,7 +9,7 @@
 
 namespace App\Blog\Domain\Model;
 
-use App\User\Domain\Model\User;
+use App\Blog\Domain\Enum\BlogUserRole;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -22,17 +22,16 @@ class BlogUser
     private Blog $blog;
 
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
-    private User $user;
+    #[ORM\Column(name: 'user_id', type: 'integer', nullable: false)]
+    private ?int $userId;
 
-    #[ORM\Column(type: 'string', length: 50)]
-    private string $role;
+    #[ORM\Column(enumType: BlogUserRole::class)]
+    private BlogUserRole $role;
 
-    public function __construct(Blog $blog, User $user, string $role)
+    public function __construct(Blog $blog, ?int $userId, BlogUserRole $role)
     {
         $this->blog = $blog;
-        $this->user = $user;
+        $this->userId = $userId;
         $this->role = $role;
     }
 
@@ -41,17 +40,17 @@ class BlogUser
         return $this->blog;
     }
 
-    public function getUser(): User
+    public function getUserId(): ?int
     {
-        return $this->user;
+        return $this->userId;
     }
 
-    public function getRole(): string
+    public function getRole(): BlogUserRole
     {
         return $this->role;
     }
 
-    public function setRole(string $role): void
+    public function setRole(BlogUserRole $role): void
     {
         $this->role = $role;
     }
