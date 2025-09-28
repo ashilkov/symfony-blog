@@ -10,7 +10,6 @@
 namespace App\Blog\Infrastructure\Security\Blog;
 
 use App\Blog\API\Resource\Blog;
-use App\Blog\API\Resource\Post;
 use App\Blog\Domain\Enum\BlogUserRole;
 use App\Blog\Domain\Repository\BlogUserRepositoryInterface;
 use App\Blog\Domain\Security\BlogPermissionPolicyInterface;

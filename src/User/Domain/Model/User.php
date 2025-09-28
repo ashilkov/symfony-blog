@@ -9,11 +9,8 @@
 
 namespace App\User\Domain\Model;
 
-use App\Blog\Domain\Model\Subscription;
 use App\User\Domain\Enum\UserRole;
 use App\User\Domain\Repository\UserRepositoryInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -53,22 +50,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $full_name = null;
 
-    /**
-     * @var Collection<int, \App\Blog\Domain\Model\Post>
-     */
-    #[ORM\OneToMany(targetEntity: \App\Blog\Domain\Model\Post::class, mappedBy: 'user_id')]
-    private Collection $posts;
-
-    /**
-     * @var Collection<int, Subscription>
-     */
-    #[ORM\OneToMany(targetEntity: Subscription::class, mappedBy: 'subscriber')]
-    private Collection $subscriptions;
-
     public function __construct()
     {
-        $this->posts = new ArrayCollection();
-        $this->subscriptions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -179,66 +162,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setFullName(string $full_name): static
     {
         $this->full_name = $full_name;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, \App\Blog\Domain\Model\Post>
-     */
-    public function getPosts(): Collection
-    {
-        return $this->posts;
-    }
-
-    public function addPost(\App\Blog\Domain\Model\Post $post): static
-    {
-        if (!$this->posts->contains($post)) {
-            $this->posts->add($post);
-            $post->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removePost(\App\Blog\Domain\Model\Post $post): static
-    {
-        if ($this->posts->removeElement($post)) {
-            // set the owning side to null (unless already changed)
-            if ($post->getUser() === $this) {
-                $post->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Subscription>
-     */
-    public function getSubscriptions(): Collection
-    {
-        return $this->subscriptions;
-    }
-
-    public function addSubscription(Subscription $subscription): static
-    {
-        if (!$this->subscriptions->contains($subscription)) {
-            $this->subscriptions->add($subscription);
-            $subscription->setSubscriber($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSubscription(Subscription $subscription): static
-    {
-        if ($this->subscriptions->removeElement($subscription)) {
-            // set the owning side to null (unless already changed)
-            if ($subscription->getSubscriber() === $this) {
-                $subscription->setSubscriber(null);
-            }
-        }
 
         return $this;
     }

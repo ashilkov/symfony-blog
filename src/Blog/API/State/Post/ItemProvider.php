@@ -15,6 +15,7 @@ use App\Blog\API\Hydrator\BlogHydrator;
 use App\Blog\API\Hydrator\PostHydrator;
 use App\Blog\API\Resource\Post;
 use App\Blog\Domain\Repository\PostRepositoryInterface;
+use App\Blog\Infrastructure\Security\Post\AllowedActionsResolver;
 
 class ItemProvider implements ProviderInterface
 {
@@ -22,6 +23,7 @@ class ItemProvider implements ProviderInterface
         private PostRepositoryInterface $postRepository,
         private BlogHydrator $blogHydrator,
         private PostHydrator $postHydrator,
+        private AllowedActionsResolver $allowedActionsResolver,
     ) {
     }
 
@@ -40,6 +42,7 @@ class ItemProvider implements ProviderInterface
 
         $postResource = $this->postHydrator->hydrate($post);
         $postResource->blog = $this->blogHydrator->hydrate($post->getBlog());
+        $postResource->allowedActions = $this->allowedActionsResolver->resolve($postResource);
 
         return $postResource;
     }

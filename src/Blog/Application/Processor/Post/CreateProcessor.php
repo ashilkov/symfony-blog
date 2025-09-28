@@ -11,11 +11,11 @@ namespace App\Blog\Application\Processor\Post;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
 use App\Blog\API\Hydrator\PostHydrator;
 use App\Blog\API\Resource\Post as PostResource;
-use App\Blog\Domain\Model\Post;
-use App\Blog\Domain\Repository\BlogRepositoryInterface;
-use App\Blog\Domain\Repository\PostRepositoryInterface;
+use App\Blog\Application\Command\Post\CreateCommand;
+use App\Blog\Application\Handler\Post\CreateHandler;
 use Symfony\Bundle\SecurityBundle\Security;
 
 /**
@@ -25,8 +25,7 @@ readonly class CreateProcessor implements ProcessorInterface
 {
     public function __construct(
         private Security $security,
-        private PostRepositoryInterface $postRepository,
-        private BlogRepositoryInterface $blogRepository,
+        private CreateHandler $handler,
         private PostHydrator $postHydrator,
     ) {
     }
@@ -38,24 +37,18 @@ readonly class CreateProcessor implements ProcessorInterface
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        $post = new Post();
-        if (isset($data->title)) {
-            $post->setTitle($data->title);
-        }
-        if (isset($data->content)) {
-            $post->setContent($data->content);
-        }
-        if (isset($data->blog)) {
-            $blog = $this->blogRepository->findOneBy(['id' => $data->blog->id]);
-            $post->setBlog($blog);
-        }
-
         $user = $this->security->getUser();
-        if ($user?->getId()) {
-            $post->setUserId($user->getId());
+        if (null === $user) {
+            throw new AccessDeniedException('You are not allowed to create a post.');
         }
 
-        $this->postRepository->save($post, true);
+        $command = new CreateCommand(
+            title: $data->title,
+            content: $data->content,
+            blogId: $data->blogId,
+            userId: (int) $user->getId() ?? null,
+        );
+        $post = ($this->handler)($command);
 
         return $this->postHydrator->hydrate($post);
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Andrei Shilkov <aishilkov94@gmail.com>
  * @license MIT
@@ -15,13 +16,13 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class BlogPermissionVoter extends Voter
 {
-    const CREATE_BLOG = 'BLOG_CREATE_BLOG';
-    const EDIT_BLOG = 'BLOG_EDIT_BLOG';
-    const DELETE_BLOG = 'BLOG_DELETE_BLOG';
+    public const CREATE_BLOG = 'BLOG_CREATE_BLOG';
+    public const EDIT_BLOG = 'BLOG_EDIT_BLOG';
+    public const DELETE_BLOG = 'BLOG_DELETE_BLOG';
 
     public function __construct(
         private readonly BlogPermissionPolicy $policy,
-        private readonly LoggerInterface      $logger,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

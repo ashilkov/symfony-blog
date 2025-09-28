@@ -10,7 +10,6 @@
 namespace App\Blog\Domain\Security;
 
 use App\Blog\API\Resource\Blog;
-use App\Blog\API\Resource\Post;
 
 interface BlogPermissionPolicyInterface
 {

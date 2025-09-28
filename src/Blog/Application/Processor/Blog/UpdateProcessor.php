@@ -47,7 +47,6 @@ readonly class UpdateProcessor implements ProcessorInterface
 
         $blog = ($this->handler)($command);
 
-        // Hydrate read model to return consistent projection after mutation
         $resource = $this->blogHydrator->hydrate($blog);
         $resource->posts = array_map(fn ($post) => $this->postHydrator->hydrate($post), $blog->getPosts()->toArray());
         $resource->blogUsers = array_map(

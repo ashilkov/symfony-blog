@@ -11,20 +11,29 @@ namespace App\Blog\API\Resource;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use ApiPlatform\Metadata\Put;
 use App\Blog\API\DTO\Response\GeneratedPost;
 use App\Blog\API\GraphQL\PostGenerateResolver;
 use App\Blog\API\State\Post\CollectionProvider;
 use App\Blog\API\State\Post\ItemProvider;
 use App\Blog\Application\Processor\Post\CreateProcessor;
+use App\Blog\Application\Processor\Post\DeleteProcessor;
+use App\Blog\Application\Processor\Post\UpdateProcessor;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
     operations: [
         new Get(provider: ItemProvider::class),
+        new GetCollection(provider: CollectionProvider::class),
+        new \ApiPlatform\Metadata\Post(processor: CreateProcessor::class),
+        new Put(read: false, processor: UpdateProcessor::class),
+        new Delete(processor: DeleteProcessor::class),
     ],
     normalizationContext: ['groups' => ['post:read'], 'iri_only' => false, 'enable_max_depth' => true],
     denormalizationContext: ['groups' => ['post:write']],
@@ -39,10 +48,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Mutation(
             security: 'is_granted("BLOG_EDIT_POST", object)',
             name: 'edit',
+            processor: UpdateProcessor::class
         ),
         new Mutation(
             security: 'is_granted("BLOG_DELETE_POST", object)',
             name: 'delete',
+            processor: DeleteProcessor::class
         ),
         new QueryCollection(
             description: 'Get all posts of subscribed blogs',
@@ -81,6 +92,8 @@ class Post
         public ?Blog $blog = null,
         #[Groups(['post:read'])]
         public ?string $author = null,
+        #[Groups(['post:read'])]
+        public array $allowedActions = [],
     ) {
     }
 }

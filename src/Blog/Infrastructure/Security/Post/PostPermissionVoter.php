@@ -25,7 +25,7 @@ class PostPermissionVoter extends Voter
 
     public function __construct(
         private readonly PostPermissionPolicy $policy,
-        private readonly LoggerInterface      $logger,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -39,7 +39,7 @@ class PostPermissionVoter extends Voter
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
-        $userId = (int) $token->getUser()->getId();
+        $userId = (int) $token->getUser()?->getId();
         if (!$userId) {
             return false;
         }
