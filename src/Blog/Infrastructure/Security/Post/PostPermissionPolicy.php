@@ -7,7 +7,7 @@
  * @see https://github.com/ashilkov/symfony-blog
  */
 
-namespace App\Blog\Infrastructure\Security;
+namespace App\Blog\Infrastructure\Security\Post;
 
 use App\Blog\API\Resource\Blog;
 use App\Blog\API\Resource\Post;
@@ -15,9 +15,9 @@ use App\Blog\Domain\Enum\BlogUserRole;
 use App\Blog\Domain\Model\Post as PostDomain;
 use App\Blog\Domain\Repository\BlogUserRepositoryInterface;
 use App\Blog\Domain\Repository\PostRepositoryInterface;
-use App\Blog\Domain\Security\BlogPermissionPolicyInterface;
+use App\Blog\Domain\Security\PostPermissionPolicyInterface;
 
-readonly class BlogPermissionPolicy implements BlogPermissionPolicyInterface
+readonly class PostPermissionPolicy implements PostPermissionPolicyInterface
 {
     public function __construct(
         private BlogUserRepositoryInterface $blogUserRepository,

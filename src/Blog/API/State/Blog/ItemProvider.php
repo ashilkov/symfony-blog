@@ -29,7 +29,7 @@ readonly class ItemProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?Blog
     {
-        $id = $uriVariables['blog_id'] ?? null;
+        $id = $uriVariables['blog_id'] ?? $uriVariables['id'] ?? null;
         if (null === $id) {
             return null;
         }

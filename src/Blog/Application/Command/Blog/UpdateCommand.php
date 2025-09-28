@@ -7,18 +7,13 @@
  * @see https://github.com/ashilkov/symfony-blog
  */
 
-namespace App\Blog\API\DTO\Response;
+namespace App\Blog\Application\Command\Blog;
 
-use Symfony\Component\Serializer\Annotation\Groups;
-
-class GeneratedBlog
+class UpdateCommand
 {
     public function __construct(
-        #[Groups(['blog:read'])]
-        public ?int $id = null,
-        #[Groups(['blog:read'])]
+        public int $id,
         public ?string $name = null,
-        #[Groups(['blog:read'])]
         public ?string $description = null,
     ) {
     }

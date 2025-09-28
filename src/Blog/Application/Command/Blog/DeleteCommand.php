@@ -7,15 +7,12 @@
  * @see https://github.com/ashilkov/symfony-blog
  */
 
-namespace App\Blog\Domain\User;
+namespace App\Blog\Application\Command\Blog;
 
-readonly class UserSummary
+class DeleteCommand
 {
     public function __construct(
-        public string $id,
-        public string $email,
-        public string $username,
-        public array $roles,
+        public int $id,
     ) {
     }
 }

@@ -11,6 +11,7 @@ namespace App\Blog\Domain\Enum;
 
 enum BlogUserRole: string
 {
-    case ROLE_USER = 'ROLE_USER';
+    case ROLE_AUTHOR = 'ROLE_AUTHOR';
+    case ROLE_EDITOR = 'ROLE_EDITOR';
     case ROLE_ADMIN = 'ROLE_ADMIN';
 }

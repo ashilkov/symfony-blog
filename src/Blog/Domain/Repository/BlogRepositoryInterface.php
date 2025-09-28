@@ -8,4 +8,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
 interface BlogRepositoryInterface extends ServiceEntityRepositoryInterface
 {
     public function save(Blog $entity, bool $flush = false): void;
+
+    public function remove(Blog $entity, bool $flush = false): void;
 }

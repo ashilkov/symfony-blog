@@ -41,7 +41,7 @@ class Blog
     /**
      * @var Collection<int, Post>
      */
-    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'blog')]
+    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'blog', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $posts;
 
     /**

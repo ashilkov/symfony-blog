@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @author Andrei Shilkov <aishilkov94@gmail.com>
  * @license MIT
@@ -7,25 +6,22 @@
  * @see https://github.com/ashilkov/symfony-blog
  */
 
-namespace App\Blog\Infrastructure\Security;
+namespace App\Blog\Infrastructure\Security\Blog;
 
-use App\Blog\API\Resource\Post;
+use App\Blog\API\Resource\Blog;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-/**
- * @extends Voter<string, Post>
- */
 class BlogPermissionVoter extends Voter
 {
-    public const CREATE_POST = 'BLOG_CREATE_POST';
-    public const EDIT_POST = 'BLOG_EDIT_POST';
-    public const DELETE_POST = 'BLOG_DELETE_POST';
+    const CREATE_BLOG = 'BLOG_CREATE_BLOG';
+    const EDIT_BLOG = 'BLOG_EDIT_BLOG';
+    const DELETE_BLOG = 'BLOG_DELETE_BLOG';
 
     public function __construct(
         private readonly BlogPermissionPolicy $policy,
-        private readonly LoggerInterface $logger,
+        private readonly LoggerInterface      $logger,
     ) {
     }
 
@@ -33,24 +29,24 @@ class BlogPermissionVoter extends Voter
     {
         $this->logger->debug('supports', ['attribute' => $attribute, 'subject' => $subject]);
 
-        return in_array($attribute, [self::CREATE_POST, self::EDIT_POST, self::DELETE_POST], true)
-            && $subject instanceof Post;
+        return in_array($attribute, [self::CREATE_BLOG, self::EDIT_BLOG, self::DELETE_BLOG], true)
+            && $subject instanceof Blog;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
-        $userId = (int) $token->getUser()->getId();
+        $userId = (int) $token->getUser()?->getId();
         if (!$userId) {
             return false;
         }
 
-        /** @var Post $post */
-        $post = $subject;
+        /** @var Blog $blog */
+        $blog = $subject;
 
         return match ($attribute) {
-            self::CREATE_POST => $post->blog && $this->policy->canCreatePost($userId, $post->blog),
-            self::EDIT_POST => $this->policy->canEditPost($userId, $post),
-            self::DELETE_POST => $this->policy->canDeletePost($userId, $post),
+            self::CREATE_BLOG => $this->policy->canCreateBlog($userId),
+            self::EDIT_BLOG => $this->policy->canEditBlog($userId, $blog),
+            self::DELETE_BLOG => $this->policy->canDeleteBlog($userId, $blog),
             default => false,
         };
     }
