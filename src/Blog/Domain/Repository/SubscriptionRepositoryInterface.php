@@ -9,8 +9,12 @@
 
 namespace App\Blog\Domain\Repository;
 
+use App\Blog\Domain\Model\Subscription;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
 
 interface SubscriptionRepositoryInterface extends ServiceEntityRepositoryInterface
 {
+    public function save(Subscription $entity, bool $flush = false): void;
+
+    public function remove(Subscription $entity, bool $flush = false): void;
 }

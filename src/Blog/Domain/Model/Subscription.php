@@ -11,9 +11,20 @@ namespace App\Blog\Domain\Model;
 
 use App\Blog\Domain\Repository\SubscriptionRepositoryInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
+#[ORM\Table(
+    name: 'subscription',
+    uniqueConstraints: [
+        new ORM\UniqueConstraint(
+            name: 'UNIQ_SUBSCRIPTION_BLOG_USER',
+            columns: ['blog_id', 'user_id']
+        ),
+    ]
+)]
 #[ORM\Entity(repositoryClass: SubscriptionRepositoryInterface::class)]
 #[ORM\HasLifecycleCallbacks]
+#[UniqueEntity(['user_id', 'blog_id'], message: 'You are already subscribed to this blog')]
 class Subscription
 {
     #[ORM\Id]
@@ -25,6 +36,7 @@ class Subscription
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'subscriptions')]
+    #[ORM\JoinColumn(name: 'blog_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Blog $blog = null;
 
     #[ORM\Column(name: 'user_id', type: 'integer', nullable: false)]

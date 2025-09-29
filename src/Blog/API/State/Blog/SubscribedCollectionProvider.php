@@ -20,7 +20,7 @@ use App\Blog\Domain\Model\Subscription;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
-readonly class CollectionProvider implements ProviderInterface
+readonly class SubscribedCollectionProvider implements ProviderInterface
 {
     public function __construct(
         private BlogHydrator $blogHydrator,
@@ -41,40 +41,37 @@ readonly class CollectionProvider implements ProviderInterface
         $offset = ($page - 1) * $itemsPerPage;
 
         $user = $this->security->getUser();
-        $userId = $user && method_exists($user, 'getId') ? (int) $user->getId() : null;
+        if (null === $user) {
+            return new ArrayPaginator([], 0, 0);
+        }
 
-        // Single query:
-        // - fetch page of blogs
-        // - compute subscribed flag
-        // - include total count via scalar subselect
+        $userId = method_exists($user, 'getId') ? (int) $user->getId() : null;
+        if (null === $userId) {
+            return new ArrayPaginator([], 0, 0);
+        }
+
+        // Query Blogs joined with Subscriptions for the current user
         $qb = $this->em->createQueryBuilder()
-            ->select('b AS blog')
-            ->addSelect('(CASE WHEN s.id IS NULL THEN 0 ELSE 1 END) AS subscribedFlag')
-            ->addSelect('(SELECT COUNT(b2.id) FROM '.Blog::class.' b2) AS totalCount')
+            ->select('b')
             ->from(Blog::class, 'b')
-            ->leftJoin(
-                Subscription::class,
-                's',
-                'WITH',
-                's.blog = b AND s.subscriberId = :uid'
-            )
-            ->setParameter('uid', $userId) // NULL when not logged in, producing no match in the ON clause
+            ->innerJoin(Subscription::class, 's', 'WITH', 's.blog = b AND s.subscriberId = :uid')
+            ->setParameter('uid', $userId)
             ->setFirstResult($offset)
             ->setMaxResults($itemsPerPage);
 
-        // Row format: ['blog' => BlogEntity, 'subscribedFlag' => 0|1, 'totalCount' => N]
-        $rows = $qb->getQuery()->getResult();
+        /** @var Blog[] $blogs */
+        $blogs = $qb->getQuery()->getResult();
 
-        $total = 0;
-        if (!empty($rows)) {
-            $total = (int) $rows[0]['totalCount'];
-        }
+        // Total count for pagination
+        $countQb = $this->em->createQueryBuilder()
+            ->select('COUNT(b.id)')
+            ->from(Blog::class, 'b')
+            ->innerJoin(Subscription::class, 's', 'WITH', 's.blog = b AND s.subscriberId = :uid')
+            ->setParameter('uid', $userId);
 
-        $items = array_map(function (array $row) {
-            /** @var Blog $blog */
-            $blog = $row['blog'];
-            $subscribed = 1 === (int) $row['subscribedFlag'];
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
+        $items = array_map(function ($blog) {
             $blogResource = $this->blogHydrator->hydrate($blog);
             $blogResource->posts = array_map(
                 fn ($post) => $this->postHydrator->hydrate($post),
@@ -84,10 +81,9 @@ readonly class CollectionProvider implements ProviderInterface
                 fn ($blogUser) => $this->blogUserHydrator->hydrate($blogUser),
                 $blog->getBlogUsers()->toArray()
             );
-            $blogResource->subscribed = $subscribed;
 
             return $blogResource;
-        }, $rows);
+        }, $blogs);
 
         // Return a paginator to satisfy API Platform expectations
         return new ArrayPaginator($items, 0, $total);

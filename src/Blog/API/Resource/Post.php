@@ -14,6 +14,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\DeleteMutation;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
@@ -22,6 +23,7 @@ use App\Blog\API\DTO\Response\GeneratedPost;
 use App\Blog\API\GraphQL\PostGenerateResolver;
 use App\Blog\API\State\Post\CollectionProvider;
 use App\Blog\API\State\Post\ItemProvider;
+use App\Blog\API\State\Post\SubscribedCollectionProvider;
 use App\Blog\Application\Processor\Post\CreateProcessor;
 use App\Blog\Application\Processor\Post\DeleteProcessor;
 use App\Blog\Application\Processor\Post\UpdateProcessor;
@@ -50,7 +52,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             name: 'edit',
             processor: UpdateProcessor::class
         ),
-        new Mutation(
+        new DeleteMutation(
             security: 'is_granted("BLOG_DELETE_POST", object)',
             name: 'delete',
             processor: DeleteProcessor::class
@@ -59,6 +61,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             description: 'Get all posts of subscribed blogs',
             security: 'is_granted("ROLE_USER")',
             name: 'subscribed',
+            provider: SubscribedCollectionProvider::class
         ),
         new Query(
             resolver: PostGenerateResolver::class,
