@@ -37,5 +37,6 @@ class BeforeCreateListener
         }
 
         $blogUser = new BlogUser($blog, $event->user->id, BlogUserRole::ROLE_ADMIN);
+        $blog->addBlogUser($blogUser);
     }
 }
