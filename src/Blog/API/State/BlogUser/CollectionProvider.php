@@ -14,8 +14,8 @@ use ApiPlatform\State\Pagination\ArrayPaginator;
 use ApiPlatform\State\ProviderInterface;
 use App\Blog\API\Hydrator\BlogHydrator;
 use App\Blog\API\Hydrator\BlogUserHydrator;
+use App\Blog\Application\CurrentUserProviderInterface;
 use App\Blog\Domain\Repository\BlogUserRepositoryInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 
 readonly class CollectionProvider implements ProviderInterface
 {
@@ -23,7 +23,7 @@ readonly class CollectionProvider implements ProviderInterface
         private BlogUserRepositoryInterface $blogUserRepository,
         private BlogHydrator $blogHydrator,
         private BlogUserHydrator $blogUserHydrator,
-        private Security $security,
+        private CurrentUserProviderInterface $userProvider,
     ) {
     }
 
@@ -41,7 +41,8 @@ readonly class CollectionProvider implements ProviderInterface
         if (isset($uriVariables['blog_id'])) {
             $searchRequest['blog'] = $uriVariables['blog_id'];
         }
-        $userId = $this->security->getUser()?->getId();
+
+        $userId = $this->userProvider->getUserId();
         if (null === $userId) {
             return null;
         }

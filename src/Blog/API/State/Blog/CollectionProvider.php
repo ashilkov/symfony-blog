@@ -15,10 +15,10 @@ use ApiPlatform\State\ProviderInterface;
 use App\Blog\API\Hydrator\BlogHydrator;
 use App\Blog\API\Hydrator\BlogUserHydrator;
 use App\Blog\API\Hydrator\PostHydrator;
+use App\Blog\Application\CurrentUserProviderInterface;
 use App\Blog\Domain\Model\Blog;
 use App\Blog\Domain\Model\Subscription;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 
 readonly class CollectionProvider implements ProviderInterface
 {
@@ -26,8 +26,8 @@ readonly class CollectionProvider implements ProviderInterface
         private BlogHydrator $blogHydrator,
         private PostHydrator $postHydrator,
         private BlogUserHydrator $blogUserHydrator,
-        private Security $security,
         private EntityManagerInterface $em,
+        private CurrentUserProviderInterface $userProvider,
     ) {
     }
 
@@ -40,13 +40,7 @@ readonly class CollectionProvider implements ProviderInterface
         $itemsPerPage = $itemsPerPage > 0 ? $itemsPerPage : 30;
         $offset = ($page - 1) * $itemsPerPage;
 
-        $user = $this->security->getUser();
-        $userId = $user && method_exists($user, 'getId') ? (int) $user->getId() : null;
-
-        // Single query:
-        // - fetch page of blogs
-        // - compute subscribed flag
-        // - include total count via scalar subselect
+        $userId = $this->userProvider->getUserId();
         $qb = $this->em->createQueryBuilder()
             ->select('b AS blog')
             ->addSelect('(CASE WHEN s.id IS NULL THEN 0 ELSE 1 END) AS subscribedFlag')

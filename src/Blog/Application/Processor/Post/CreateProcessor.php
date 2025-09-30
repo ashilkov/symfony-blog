@@ -15,8 +15,8 @@ use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
 use App\Blog\API\Hydrator\PostHydrator;
 use App\Blog\API\Resource\Post as PostResource;
 use App\Blog\Application\Command\Post\CreateCommand;
+use App\Blog\Application\CurrentUserProviderInterface;
 use App\Blog\Application\Handler\Post\CreateHandler;
-use Symfony\Bundle\SecurityBundle\Security;
 
 /**
  * @implements ProcessorInterface<PostResource, PostResource>
@@ -24,21 +24,19 @@ use Symfony\Bundle\SecurityBundle\Security;
 readonly class CreateProcessor implements ProcessorInterface
 {
     public function __construct(
-        private Security $security,
         private CreateHandler $handler,
         private PostHydrator $postHydrator,
+        private CurrentUserProviderInterface $userProvider,
     ) {
     }
 
     /**
      * @param PostResource|object $data
-     *
-     * @return PostResource
      */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): PostResource
     {
-        $user = $this->security->getUser();
-        if (null === $user) {
+        $userId = $this->userProvider->getUserId();
+        if (null === $userId) {
             throw new AccessDeniedException('You are not allowed to create a post.');
         }
 
@@ -46,7 +44,7 @@ readonly class CreateProcessor implements ProcessorInterface
             title: $data->title,
             content: $data->content,
             blogId: $data->blogId,
-            userId: (int) $user->getId() ?? null,
+            userId: $userId,
         );
         $post = ($this->handler)($command);
 

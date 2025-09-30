@@ -14,18 +14,18 @@ use ApiPlatform\State\Pagination\ArrayPaginator;
 use ApiPlatform\State\ProviderInterface;
 use App\Blog\API\Hydrator\BlogHydrator;
 use App\Blog\API\Hydrator\PostHydrator;
+use App\Blog\Application\CurrentUserProviderInterface;
 use App\Blog\Domain\Model\Post;
 use App\Blog\Domain\Model\Subscription as DomainSubscription;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 
 readonly class SubscribedCollectionProvider implements ProviderInterface
 {
     public function __construct(
-        private Security $security,
         private EntityManagerInterface $em,
         private PostHydrator $postHydrator,
         private BlogHydrator $blogHydrator,
+        private CurrentUserProviderInterface $userProvider,
     ) {
     }
 
@@ -38,12 +38,7 @@ readonly class SubscribedCollectionProvider implements ProviderInterface
         $itemsPerPage = $itemsPerPage > 0 ? $itemsPerPage : 30;
         $offset = ($page - 1) * $itemsPerPage;
 
-        $user = $this->security->getUser();
-        if (null === $user) {
-            return new ArrayPaginator([], 0, 0);
-        }
-
-        $userId = method_exists($user, 'getId') ? (int) $user->getId() : null;
+        $userId = $this->userProvider->getUserId();
         if (null === $userId) {
             return new ArrayPaginator([], 0, 0);
         }

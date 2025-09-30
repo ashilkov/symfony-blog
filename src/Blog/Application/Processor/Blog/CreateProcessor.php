@@ -15,29 +15,29 @@ use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
 use App\Blog\API\Hydrator\BlogHydrator;
 use App\Blog\API\Resource\Blog as BlogResource;
 use App\Blog\Application\Command\Blog\CreateCommand;
+use App\Blog\Application\CurrentUserProviderInterface;
 use App\Blog\Application\Handler\Blog\CreateHandler;
-use Symfony\Bundle\SecurityBundle\Security;
 
 readonly class CreateProcessor implements ProcessorInterface
 {
     public function __construct(
         private CreateHandler $handler,
         private BlogHydrator $hydrator,
-        private Security $security,
+        private CurrentUserProviderInterface $userProvider,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): BlogResource
     {
-        $user = $this->security->getUser();
-        if (null === $user) {
+        $userId = $this->userProvider->getUserId();
+        if (null === $userId) {
             throw new AccessDeniedException('You are not allowed to create a blog.');
         }
 
         $command = new CreateCommand(
             name: $data->name ?? null,
             description: $data->description ?? null,
-            userId: $user->getId() ?? null
+            userId: $userId
         );
 
         $blog = ($this->handler)($command);

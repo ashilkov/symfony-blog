@@ -50,5 +50,6 @@ services:
 
     # Dependency Injection
     App\User\Application\Hydrator\UserHydratorInterface: '@App\User\Application\Hydrator\UserOutputHydrator'
+    App\Blog\Application\CurrentUserProviderInterface: '@App\Blog\Infrastructure\Security\CurrentUserProvider'
 
 

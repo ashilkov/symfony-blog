@@ -15,10 +15,10 @@ use ApiPlatform\State\ProviderInterface;
 use App\Blog\API\Hydrator\BlogHydrator;
 use App\Blog\API\Hydrator\BlogUserHydrator;
 use App\Blog\API\Hydrator\PostHydrator;
+use App\Blog\Application\CurrentUserProviderInterface;
 use App\Blog\Domain\Model\Blog;
 use App\Blog\Domain\Model\Subscription;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 
 readonly class SubscribedCollectionProvider implements ProviderInterface
 {
@@ -26,8 +26,8 @@ readonly class SubscribedCollectionProvider implements ProviderInterface
         private BlogHydrator $blogHydrator,
         private PostHydrator $postHydrator,
         private BlogUserHydrator $blogUserHydrator,
-        private Security $security,
         private EntityManagerInterface $em,
+        private CurrentUserProviderInterface $userProvider,
     ) {
     }
 
@@ -40,12 +40,7 @@ readonly class SubscribedCollectionProvider implements ProviderInterface
         $itemsPerPage = $itemsPerPage > 0 ? $itemsPerPage : 30;
         $offset = ($page - 1) * $itemsPerPage;
 
-        $user = $this->security->getUser();
-        if (null === $user) {
-            return new ArrayPaginator([], 0, 0);
-        }
-
-        $userId = method_exists($user, 'getId') ? (int) $user->getId() : null;
+        $userId = $this->userProvider->getUserId();
         if (null === $userId) {
             return new ArrayPaginator([], 0, 0);
         }

@@ -15,38 +15,36 @@ use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
 use App\Blog\API\Hydrator\SubscriptionHydrator;
 use App\Blog\API\Resource\Subscription;
 use App\Blog\Application\Command\Subscription\DeleteCommand;
+use App\Blog\Application\CurrentUserProviderInterface;
 use App\Blog\Application\Handler\Subscription\DeleteHandler;
 use App\Blog\Domain\Repository\SubscriptionRepositoryInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 
 readonly class DeleteProcessor implements ProcessorInterface
 {
     public function __construct(
         private SubscriptionRepositoryInterface $subscriptionRepository,
         private DeleteHandler $handler,
-        private Security $security,
         private SubscriptionHydrator $hydrator,
+        private CurrentUserProviderInterface $currentUserProvider,
     ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Subscription
     {
-        $user = $this->security->getUser();
-        if (null === $user) {
+        $userId = $this->currentUserProvider->getUserId();
+        if (null === $userId) {
             throw new AccessDeniedException('You are not allowed to unsubscribe from a blog.');
         }
 
-        $blogId = $uriVariables['blog_id']
-            ?? ($data->blogId ?? null)
-            ?? ($context['args']['input']['blogId'] ?? null);
+        $blogId = $uriVariables['blog_id'] ?? ($data->blogId ?? null);
 
         if (null === $blogId) {
             throw new \InvalidArgumentException('Blog ID is required for Subscription delete.');
         }
-
+        /** @var \App\Blog\Domain\Model\Subscription $subscription */
         $subscription = $this->subscriptionRepository->findOneBy([
             'blog' => $blogId,
-            'subscriberId' => $user->getId(),
+            'subscriberId' => $userId,
         ]);
         if (null === $subscription) {
             throw new \InvalidArgumentException('Subscription not found for the given blog and user.');
