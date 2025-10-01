@@ -39,7 +39,10 @@ readonly class PostGenerateResolver extends AbstractGenerateResolver
         $content = $args['args']['content'] ?? '';
         $blog = $this->blogRepository->findOneBy(['id' => $args['args']['blogId']]);
 
-        return "Generate a content for a short blog post. Return result as JSON in the following form: {$this->getSchema()}. Title: {$title}. Content: {$content} (use html for better formatting). Blog name: {$blog->getName()}. Blog description: {$blog->getDescription()}";
+        return "Generate a content for a moderate size blog post. Return result as JSON in the following form: {$this->getSchema()}.
+        Title: {$title}. Content: {$content} (use html for better formatting).
+        Blog name: {$blog->getName()}. Blog description: {$blog->getDescription()}.
+        Feel free to update both the title and the content. Post should have a specific topic and shouldn't mention the blog name or description.";
     }
 
     protected function prepareResponse(array $response): object
