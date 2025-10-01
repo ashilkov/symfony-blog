@@ -44,9 +44,11 @@ services:
 
 
     # Event Listeners
-    App\Blog\Application\Listener\Blog\BeforeCreateListener:
+    App\Blog\Infrastructure\Doctrine\Listener\TimestampListener:
         tags:
-            - { name: doctrine.event_listener, event: 'App\Blog\Domain\Event\Blog\BeforeCreateEvent', method: '__invoke' }
+            - { name: doctrine.event_listener, event: prePersist }
+            - { name: doctrine.event_listener, event: preUpdate }
+
 
     # Dependency Injection
     App\User\Application\Hydrator\UserHydratorInterface: '@App\User\Application\Hydrator\UserOutputHydrator'

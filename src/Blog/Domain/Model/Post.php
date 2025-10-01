@@ -9,39 +9,29 @@
 
 namespace App\Blog\Domain\Model;
 
-use App\Blog\Domain\Repository\PostRepositoryInterface;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
-
-#[ORM\Entity(repositoryClass: PostRepositoryInterface::class)]
-#[ORM\HasLifecycleCallbacks]
-class Post
+class Post implements EntityInterface
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
     /**
-     * @phpstan-ignore-next-line Doctrine sets the ID at runtime
+     * @var Comment[]
      */
-    private ?int $id = null;
+    private array $comments = [];
 
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $content = null;
-
-    #[ORM\Column(name: 'user_id', type: 'integer', nullable: false)]
-    private ?int $userId = null;
-
-    #[ORM\ManyToOne(inversedBy: 'posts')]
     private ?Blog $blog = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $title = null;
+    public function __construct(
+        private ?int $id = null,
+        private ?string $title = null,
+        private ?string $content = null,
+        private ?int $userId = null,
+        private ?\DateTimeImmutable $createdAt = null,
+        private ?\DateTimeImmutable $updatedAt = null,
+    ) {
+    }
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $updated_at = null;
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
+    }
 
     public function getId(): ?int
     {
@@ -98,41 +88,53 @@ class Post
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
-        return $this->updated_at;
+        return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
-        $this->updated_at = $updated_at;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
 
-    #[ORM\PrePersist]
-    public function setTimestampsOnCreate(): void
+    public function getComments(): iterable
     {
-        $now = new \DateTimeImmutable();
-        if (null === $this->created_at) {
-            $this->created_at = $now;
-        }
-        $this->updated_at = $now;
+        return $this->comments;
     }
 
-    #[ORM\PreUpdate]
-    public function setTimestampOnUpdate(): void
+    public function addComment(Comment $comment): static
     {
-        $this->updated_at = new \DateTimeImmutable();
+        if (isset($this->comments[$comment->getId()])) {
+            return $this;
+        }
+
+        $this->comments[$comment->getId()] = $comment;
+        $comment->setPost($this);
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): static
+    {
+        if (!isset($this->comments[$comment->getId()])) {
+            return $this;
+        }
+
+        unset($this->comments[$comment->getId()]);
+
+        return $this;
     }
 }

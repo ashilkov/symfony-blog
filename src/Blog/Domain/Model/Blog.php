@@ -9,52 +9,35 @@
 
 namespace App\Blog\Domain\Model;
 
-use App\Blog\Domain\Repository\BlogRepositoryInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
-
-#[ORM\Entity(repositoryClass: BlogRepositoryInterface::class)]
-class Blog
+class Blog implements EntityInterface
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
     /**
-     * @phpstan-ignore-next-line Doctrine sets the ID at runtime
+     * @var BlogUser[]
      */
-    private ?int $id = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
-
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $description = null;
+    private array $blogUsers = [];
 
     /**
-     * @var Collection <int, BlogUser>
+     * @var Post[]
      */
-    #[ORM\OneToMany(targetEntity: BlogUser::class, mappedBy: 'blog', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    private Collection $blogUsers;
+    private array $posts = [];
 
     /**
-     * @var Collection<int, Post>
+     * @var Subscription[]
      */
-    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'blog', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    private Collection $posts;
+    private array $subscriptions = [];
 
-    /**
-     * @var Collection<int, Subscription>
-     */
-    #[ORM\OneToMany(targetEntity: Subscription::class, mappedBy: 'blog')]
-    private Collection $subscriptions;
+    public function __construct(
+        private ?int $id = null,
+        private ?string $name = null,
+        private ?string $description = null,
+        private ?\DateTimeImmutable $createdAt = null,
+        private ?\DateTimeImmutable $updatedAt = null,
+    ) {
+    }
 
-    public function __construct()
+    public function setId(?int $id): void
     {
-        $this->blogUsers = new ArrayCollection();
-        $this->posts = new ArrayCollection();
-        $this->subscriptions = new ArrayCollection();
+        $this->id = $id;
     }
 
     public function getId(): ?int
@@ -86,88 +69,106 @@ class Blog
         return $this;
     }
 
-    /**
-     * @return Collection<int, BlogUser>
-     */
-    public function getBlogUsers(): Collection
+    public function getBlogUsers(): iterable
     {
         return $this->blogUsers;
     }
 
     public function addBlogUser(BlogUser $blogUser): self
     {
-        if (!$this->blogUsers->contains($blogUser)) {
-            $this->blogUsers->add($blogUser);
-            // If you add a setter on BlogUser, you can uncomment the next line
-            // $blogUser->setBlog($this);
+        if (isset($this->blogUsers[$blogUser->getUserId()])) {
+            return $this;
         }
+        $blogUser->setBlog($this);
+        $this->blogUsers[$blogUser->getUserId()] = $blogUser;
 
         return $this;
     }
 
     public function removeBlogUser(BlogUser $blogUser): self
     {
-        $this->blogUsers->removeElement($blogUser);
+        if (!isset($this->blogUsers[$blogUser->getUserId()])) {
+            return $this;
+        }
+        unset($this->blogUsers[$blogUser->getUserId()]);
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, Post>
-     */
-    public function getPosts(): Collection
+    /** @return iterable<Post> */
+    public function getPosts(): iterable
     {
         return $this->posts;
     }
 
     public function addPost(Post $post): static
     {
-        if (!$this->posts->contains($post)) {
-            $this->posts->add($post);
-            $post->setBlog($this);
+        if (isset($this->posts[$post->getId()])) {
+            return $this;
         }
+        $this->posts[$post->getId()] = $post;
+        $post->setBlog($this);
 
         return $this;
     }
 
     public function removePost(Post $post): static
     {
-        if ($this->posts->removeElement($post)) {
-            // set the owning side to null (unless already changed)
-            if ($post->getBlog() === $this) {
-                $post->setBlog(null);
-            }
+        if (!isset($this->posts[$post->getId()])) {
+            return $this;
         }
+        unset($this->posts[$post->getId()]);
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, Subscription>
-     */
-    public function getSubscriptions(): Collection
+    /** @return iterable<Subscription> */
+    public function getSubscriptions(): iterable
     {
         return $this->subscriptions;
     }
 
     public function addSubscription(Subscription $subscription): static
     {
-        if (!$this->subscriptions->contains($subscription)) {
-            $this->subscriptions->add($subscription);
-            $subscription->setBlog($this);
+        if (isset($this->subscriptions[$subscription->getId()])) {
+            return $this;
         }
+        $subscription->setBlog($this);
+        $this->subscriptions[$subscription->getId()] = $subscription;
 
         return $this;
     }
 
     public function removeSubscription(Subscription $subscription): static
     {
-        if ($this->subscriptions->removeElement($subscription)) {
-            // set the owning side to null (unless already changed)
-            if ($subscription->getBlog() === $this) {
-                $subscription->setBlog(null);
-            }
+        if (!isset($this->subscriptions[$subscription->getId()])) {
+            return $this;
         }
+        unset($this->subscriptions[$subscription->getId()]);
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

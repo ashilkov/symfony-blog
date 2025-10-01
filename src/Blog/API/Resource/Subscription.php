@@ -37,7 +37,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             read: false,
             name: 'delete',
             processor: DeleteProcessor::class
-        )
+        ),
     ]
 )]
 class Subscription
@@ -50,7 +50,6 @@ class Subscription
         public ?int $blogId = null,
         #[Groups(['subscription:read', 'subscription:write'])]
         public ?int $subscriberId = null,
-    )
-    {
+    ) {
     }
 }

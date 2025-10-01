@@ -13,7 +13,9 @@ use App\Blog\Domain\Enum\BlogUserRole;
 use App\Blog\Domain\Event\BeforeCreateEvent;
 use App\Blog\Domain\Model\BlogUser;
 use App\Blog\Domain\User\UserReadModelPortInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
+#[AsEventListener(event: BeforeCreateEvent::class, method: '__invoke')]
 class BeforeCreateListener
 {
     public function __construct(
@@ -36,7 +38,12 @@ class BeforeCreateListener
             throw new \LogicException('User is required to create a blog.');
         }
 
-        $blogUser = new BlogUser($blog, $event->user->id, BlogUserRole::ROLE_ADMIN);
+        $blogUser = new BlogUser(
+            userId: $event->user->id,
+            role: BlogUserRole::ROLE_ADMIN,
+            blog: $blog
+        );
+
         $blog->addBlogUser($blogUser);
     }
 }

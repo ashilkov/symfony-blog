@@ -9,17 +9,17 @@
 
 namespace App\Blog\Infrastructure\Repository;
 
-use App\Blog\Domain\Repository\PostRepositoryInterface;
-use App\Blog\Infrastructure\Doctrine\Entity\Post;
+use App\Blog\Domain\Repository\CommentRepositoryInterface;
+use App\Blog\Infrastructure\Doctrine\Entity\Comment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
- * @extends ServiceEntityRepository<Post>
+ * @extends ServiceEntityRepository<Comment>
  */
-class PostRepository extends AbstractRepository implements PostRepositoryInterface
+class CommentRepository extends AbstractRepository implements CommentRepositoryInterface
 {
     public function getEntityType(): string
     {
-        return Post::class;
+        return Comment::class;
     }
 }

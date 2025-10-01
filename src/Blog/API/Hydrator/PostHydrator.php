@@ -25,8 +25,8 @@ readonly class PostHydrator
             id: $post->getId(),
             title: $post->getTitle(),
             content: $post->getContent(),
-            createdAt: $post->getCreatedAt()->format('Y-m-d H:i:s'),
-            updatedAt: $post->getUpdatedAt()->format('Y-m-d H:i:s'),
+            createdAt: $post->getCreatedAt()?->format('Y-m-d H:i:s'),
+            updatedAt: $post->getUpdatedAt()?->format('Y-m-d H:i:s'),
             author: $this->userReadModelPort->findSummaryById($post->getUserId())->username
         );
     }

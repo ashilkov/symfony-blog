@@ -35,13 +35,13 @@ readonly class ItemProvider implements ProviderInterface
         }
 
         /** @var \App\Blog\Domain\Model\Blog $blog */
-        $blog = $this->blogRepository->findOneBy(['id' => (int) $id]);
+        $blog = $this->blogRepository->find((int) $id);
         if (null === $blog) {
             return null;
         }
 
         $blogResource = $this->blogHydrator->hydrate($blog);
-        $blogResource->posts = array_map(fn ($post) => $this->postHydrator->hydrate($post), $blog->getPosts()->toArray());
+        $blogResource->posts = array_map(fn ($post) => $this->postHydrator->hydrate($post), $blog->getPosts());
         $blogResource->blogUsers = array_map(
             function ($blogUser) {
                 $blogUserResource = $this->blogUserHydrator->hydrate($blogUser);
@@ -49,7 +49,8 @@ readonly class ItemProvider implements ProviderInterface
 
                 return $blogUserResource;
             },
-            $blog->getBlogUsers()->toArray());
+            $blog->getBlogUsers()
+        );
 
         return $blogResource;
     }

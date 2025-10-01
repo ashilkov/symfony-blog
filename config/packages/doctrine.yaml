@@ -19,10 +19,10 @@ doctrine:
         auto_mapping: true
         mappings:
             Blog:
-                type: attribute
+                type: xml
                 is_bundle: false
-                dir: '%kernel.project_dir%/src/Blog/Domain/Model'
-                prefix: 'App\Blog\Domain\Model'
+                dir: '%kernel.project_dir%/src/Blog/Infrastructure/Doctrine/Mapping'
+                prefix: 'App\Blog\Infrastructure\Doctrine\Entity'
                 alias: Blog
             User:
                 type: attribute

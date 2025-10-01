@@ -4,8 +4,8 @@ api_platform:
     enable_swagger_ui: true
     mapping:
         paths: [
-            '%kernel.project_dir%/src/Blog/',
-            '%kernel.project_dir%/src/User/'
+            '%kernel.project_dir%/src/Blog/API/',
+            '%kernel.project_dir%/src/User/API/'
         ]
     formats:
         json: ['application/json']

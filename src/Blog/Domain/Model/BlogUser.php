@@ -10,34 +10,24 @@
 namespace App\Blog\Domain\Model;
 
 use App\Blog\Domain\Enum\BlogUserRole;
-use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
-#[ORM\Table(name: '`blog_user`')]
-class BlogUser
+class BlogUser implements EntityInterface
 {
-    #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: Blog::class, inversedBy: 'blogUsers')]
-    #[ORM\JoinColumn(name: 'blog_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
-    private Blog $blog;
-
-    #[ORM\Id]
-    #[ORM\Column(name: 'user_id', type: 'integer', nullable: false)]
-    private ?int $userId;
-
-    #[ORM\Column(enumType: BlogUserRole::class)]
-    private BlogUserRole $role;
-
-    public function __construct(Blog $blog, ?int $userId, BlogUserRole $role)
-    {
-        $this->blog = $blog;
-        $this->userId = $userId;
-        $this->role = $role;
+    public function __construct(
+        private ?int $userId = null,
+        private ?BlogUserRole $role = null,
+        private ?Blog $blog = null,
+    ) {
     }
 
     public function getBlog(): Blog
     {
         return $this->blog;
+    }
+
+    public function setBlog(Blog $blog): void
+    {
+        $this->blog = $blog;
     }
 
     public function getUserId(): ?int

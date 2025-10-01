@@ -28,6 +28,7 @@ use App\Blog\Application\Processor\Blog\CreateProcessor;
 use App\Blog\Application\Processor\Blog\DeleteProcessor;
 use App\Blog\Application\Processor\Blog\UpdateProcessor;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ApiResource(
     operations: [
@@ -46,17 +47,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Query(provider: ItemProvider::class),
         new QueryCollection(provider: CollectionProvider::class),
         new Mutation(
-            security: 'is_granted("BLOG_CREATE_BLOG", object)',
+            securityPostDenormalize: 'is_granted("BLOG_CREATE_BLOG", object)',
             name: 'create',
             processor: CreateProcessor::class
         ),
         new Mutation(
-            security: 'is_granted("BLOG_EDIT_BLOG", object)',
+            securityPostDenormalize: 'is_granted("BLOG_EDIT_BLOG", object)',
             name: 'update',
             processor: UpdateProcessor::class
         ),
         new DeleteMutation(
-            security: 'is_granted("BLOG_DELETE_BLOG", object)',
+            securityPostDenormalize: 'is_granted("BLOG_DELETE_BLOG", object)',
             name: 'delete',
             processor: DeleteProcessor::class
         ),
@@ -76,6 +77,7 @@ class Blog
     /** @var Post[] */
     #[Groups(['blog:read'])]
     #[ApiProperty(readableLink: true)]
+    #[MaxDepth(1)]
     public array $posts = [];
 
     /** @var BlogUser[] */
@@ -85,7 +87,7 @@ class Blog
 
     public function __construct(
         #[ApiProperty(identifier: true)]
-        #[Groups(['blog:read', 'blog_user:read'])]
+        #[Groups(['blog:read', 'blog_user:read', 'post:read'])]
         public ?int $id = null,
         #[Groups(['blog:read', 'post:read', 'blog:write'])]
         public ?string $name = null,

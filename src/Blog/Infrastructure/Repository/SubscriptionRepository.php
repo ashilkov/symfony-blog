@@ -9,36 +9,17 @@
 
 namespace App\Blog\Infrastructure\Repository;
 
-use App\Blog\Domain\Model\Subscription;
 use App\Blog\Domain\Repository\SubscriptionRepositoryInterface;
+use App\Blog\Infrastructure\Doctrine\Entity\Subscription;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Subscription>
  */
-class SubscriptionRepository extends ServiceEntityRepository implements SubscriptionRepositoryInterface
+class SubscriptionRepository extends AbstractRepository implements SubscriptionRepositoryInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    public function getEntityType(): string
     {
-        parent::__construct($registry, Subscription::class);
-    }
-
-    public function save(Subscription $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function remove(Subscription $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        return Subscription::class;
     }
 }

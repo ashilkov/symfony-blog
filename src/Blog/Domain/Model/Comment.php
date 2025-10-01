@@ -1,20 +1,14 @@
 <?php
 
-/**
- * @author Andrei Shilkov <aishilkov94@gmail.com>
- * @license MIT
- *
- * @see https://github.com/ashilkov/symfony-blog
- */
-
 namespace App\Blog\Domain\Model;
 
-class Subscription implements EntityInterface
+class Comment implements EntityInterface
 {
     public function __construct(
         private ?int $id = null,
-        private ?Blog $blog = null,
-        private ?int $subscriberId = null,
+        private ?int $userId = null,
+        private ?string $content = null,
+        private ?Post $post = null,
         private ?\DateTimeImmutable $createdAt = null,
         private ?\DateTimeImmutable $updatedAt = null,
     ) {
@@ -30,26 +24,38 @@ class Subscription implements EntityInterface
         return $this->id;
     }
 
-    public function getBlog(): ?Blog
+    public function getUserId(): ?int
     {
-        return $this->blog;
+        return $this->userId;
     }
 
-    public function setBlog(?Blog $blog): static
+    public function setUserId(?int $userId): static
     {
-        $this->blog = $blog;
+        $this->userId = $userId;
 
         return $this;
     }
 
-    public function getSubscriberId(): ?int
+    public function getContent(): ?string
     {
-        return $this->subscriberId;
+        return $this->content;
     }
 
-    public function setSubscriberId(?int $subscriberId): static
+    public function setContent(string $content): static
     {
-        $this->subscriberId = $subscriberId;
+        $this->content = $content;
+
+        return $this;
+    }
+
+    public function getPost(): ?Post
+    {
+        return $this->post;
+    }
+
+    public function setPost(?Post $post): static
+    {
+        $this->post = $post;
 
         return $this;
     }

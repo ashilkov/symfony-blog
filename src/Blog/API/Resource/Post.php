@@ -45,7 +45,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Mutation(
             securityPostDenormalize: "is_granted('BLOG_CREATE_POST', object)",
             name: 'create',
-            processor: CreateProcessor::class
+            processor: CreateProcessor::class,
         ),
         new Mutation(
             security: 'is_granted("BLOG_EDIT_POST", object)',
