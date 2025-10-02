@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\GraphQl\DeleteMutation;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Put;
 use App\Blog\API\DTO\Response\GeneratedPost;
 use App\Blog\API\GraphQL\PostGenerateResolver;
@@ -28,10 +29,14 @@ use App\Blog\Application\Processor\Post\CreateProcessor;
 use App\Blog\Application\Processor\Post\DeleteProcessor;
 use App\Blog\Application\Processor\Post\UpdateProcessor;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ApiResource(
     operations: [
-        new Get(provider: ItemProvider::class),
+        new Get(
+            uriVariables: ['post_id' => new Link(fromClass: Post::class, identifiers: ['id'])],
+            provider: ItemProvider::class,
+        ),
         new GetCollection(provider: CollectionProvider::class),
         new \ApiPlatform\Metadata\Post(processor: CreateProcessor::class),
         new Put(read: false, processor: UpdateProcessor::class),
@@ -79,6 +84,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
 )]
 class Post
 {
+    /** @var Comment[] */
+    #[Groups(['post:read'])]
+    #[ApiProperty(readableLink: true)]
+    #[MaxDepth(1)]
+    public array $comments = [];
+
     public function __construct(
         #[ApiProperty(identifier: true)]
         #[Groups(['post:read'])]
@@ -97,6 +108,8 @@ class Post
         public ?string $author = null,
         #[Groups(['post:read'])]
         public array $allowedActions = [],
+        public ?array $commentsData = [],
     ) {
+        $this->comments = $commentsData ?? [];
     }
 }

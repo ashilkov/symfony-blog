@@ -17,10 +17,7 @@ use App\Blog\API\Hydrator\BlogUserHydrator;
 use App\Blog\API\Hydrator\PostHydrator;
 use App\Blog\Application\CurrentUserProviderInterface;
 use App\Blog\Domain\Model\Blog;
-use App\Blog\Domain\Model\Subscription;
 use App\Blog\Domain\Repository\BlogRepositoryInterface;
-use App\Blog\Infrastructure\Repository\BlogRepository;
-use Doctrine\ORM\EntityManagerInterface;
 
 readonly class CollectionProvider implements ProviderInterface
 {

@@ -9,8 +9,8 @@
 
 namespace App\Blog\Infrastructure\Repository;
 
-use App\Blog\Domain\Model\EntityInterface;
 use App\Blog\Domain\Model\Blog as DomainEntity;
+use App\Blog\Domain\Model\EntityInterface;
 use App\Blog\Domain\Repository\BlogRepositoryInterface;
 use App\Blog\Infrastructure\Doctrine\Entity\Blog;
 use App\Blog\Infrastructure\Doctrine\Entity\BlogUser;
@@ -27,8 +27,6 @@ class BlogRepository extends AbstractRepository implements BlogRepositoryInterfa
     }
 
     /**
-     * @param int|null $userId
-     * @return array
      * @throws \Exception
      */
     public function findWithSubscriptions(?int $userId): array

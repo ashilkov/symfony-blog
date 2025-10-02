@@ -14,4 +14,5 @@ enum Actions: string
     public const VIEW = 'view';
     public const EDIT = 'edit';
     public const DELETE = 'delete';
+    public const COMMENT = 'comment';
 }

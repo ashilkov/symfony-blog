@@ -105,7 +105,7 @@ readonly class EntityAssembler implements AssemblerInterface
                 $doctrineEntity->blogUsers->clear();
 
                 foreach ($entity->getBlogUsers() as $blogUser) {
-                    if ($doctrineEntity->id !== null) {
+                    if (null !== $doctrineEntity->id) {
                         $doctrineEntity->blogUsers->add(
                             $this->em->getReference(
                                 BlogUser::class,

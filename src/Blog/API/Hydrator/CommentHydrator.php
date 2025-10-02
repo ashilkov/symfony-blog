@@ -11,14 +11,19 @@ namespace App\Blog\API\Hydrator;
 
 use App\Blog\API\Resource\Comment as CommentResource;
 use App\Blog\Domain\Model\Comment;
+use App\Blog\Domain\User\UserReadModelPortInterface;
 
 class CommentHydrator
 {
+    public function __construct(private UserReadModelPortInterface $userReadModelPort)
+    {
+    }
+
     public function hydrate(Comment $comment): CommentResource
     {
         return new CommentResource(
             id: $comment->getId(),
-            userId: $comment->getUserId(),
+            author: $this->userReadModelPort->findSummaryById($comment->getUserId())->username,
             postId: $comment->getPost()->getId(),
             content: $comment->getContent(),
             createdAt: $comment->getCreatedAt()->format('Y-m-d H:i:s'),

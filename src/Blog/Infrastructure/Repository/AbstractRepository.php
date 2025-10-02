@@ -21,10 +21,9 @@ abstract class AbstractRepository extends ServiceEntityRepository
 {
     public function __construct(
         protected readonly EntityManagerInterface $entityManager,
-        protected readonly EntityAssembler      $entityAssembler,
-        ManagerRegistry                         $registry,
-    )
-    {
+        protected readonly EntityAssembler $entityAssembler,
+        ManagerRegistry $registry,
+    ) {
         parent::__construct($registry, $this->getEntityType());
     }
 
@@ -82,7 +81,6 @@ abstract class AbstractRepository extends ServiceEntityRepository
         }
     }
 
-
     abstract public function getEntityType(): string;
 
     protected function saveBefore(EntityInterface $entity, object $doctrineEntity): void
@@ -109,5 +107,4 @@ abstract class AbstractRepository extends ServiceEntityRepository
             $entity->setUpdatedAt($doctrineEntity->updatedAt);
         }
     }
-
 }

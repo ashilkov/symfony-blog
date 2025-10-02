@@ -38,6 +38,12 @@ readonly class CreateHandler
             throw new \LogicException('User is required to create a blog.');
         }
 
+        /** @var Blog $blog */
+        $blog = $this->blogs->find($command->blogId);
+        if (null === $blog) {
+            throw new \LogicException('Blog is required to create a post.');
+        }
+
         $post->setUserId($user->id);
 
         if (null !== $command->title) {
@@ -46,14 +52,7 @@ readonly class CreateHandler
         if (null !== $command->content) {
             $post->setContent($command->content);
         }
-        if (null !== $command->blogId) {
-            /** @var Blog $blog */
-            $blog = $this->blogs->find($command->blogId);
-            if (null === $blog) {
-                throw new \LogicException('Blog is required to create a post.');
-            }
-            $post->setBlog($blog);
-        }
+        $post->setBlog($blog);
 
         $this->posts->save($post, true);
 

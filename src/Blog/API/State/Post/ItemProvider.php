@@ -12,6 +12,7 @@ namespace App\Blog\API\State\Post;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Blog\API\Hydrator\BlogHydrator;
+use App\Blog\API\Hydrator\CommentHydrator;
 use App\Blog\API\Hydrator\PostHydrator;
 use App\Blog\API\Resource\Post;
 use App\Blog\Domain\Repository\PostRepositoryInterface;
@@ -23,13 +24,14 @@ class ItemProvider implements ProviderInterface
         private PostRepositoryInterface $postRepository,
         private BlogHydrator $blogHydrator,
         private PostHydrator $postHydrator,
+        private CommentHydrator $commentHydrator,
         private AllowedActionsResolver $allowedActionsResolver,
     ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?Post
     {
-        $id = $uriVariables['id'] ?? null;
+        $id = $uriVariables['post_id'] ?? $uriVariables['id'] ?? null;
         if (null === $id) {
             return null;
         }
@@ -43,6 +45,7 @@ class ItemProvider implements ProviderInterface
         $postResource = $this->postHydrator->hydrate($post);
         $postResource->blog = $this->blogHydrator->hydrate($post->getBlog());
         $postResource->allowedActions = $this->allowedActionsResolver->resolve($postResource);
+        $postResource->comments = array_map(fn ($comment) => $this->commentHydrator->hydrate($comment), $post->getComments());
 
         return $postResource;
     }
