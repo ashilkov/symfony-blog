@@ -7,7 +7,7 @@
  * @see https://github.com/ashilkov/symfony-blog
  */
 
-namespace App\User\Domain\Model;
+namespace App\User\Infrastructure\Doctrine\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Gesdinet\JWTRefreshTokenBundle\Entity\RefreshToken as BaseRefreshToken;

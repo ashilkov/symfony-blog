@@ -25,10 +25,16 @@ doctrine:
                 prefix: 'App\Blog\Infrastructure\Doctrine\Entity'
                 alias: Blog
             User:
+                type: xml
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/User/Infrastructure/Doctrine/Mapping'
+                prefix: 'App\User\Domain\Model'
+                alias: User
+            UserDoctrineEntities:
                 type: attribute
                 is_bundle: false
-                dir: '%kernel.project_dir%/src/User/Domain/Model'
-                prefix: 'App\User\Domain\Model'
+                dir: '%kernel.project_dir%/src/User/Infrastructure/Doctrine/Entity'
+                prefix: 'App\User\Infrastructure\Doctrine\Entity'
                 alias: User
         controller_resolver:
             auto_mapping: false
