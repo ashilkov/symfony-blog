@@ -97,6 +97,10 @@ class Blog
         ?array $postsData = null,
         #[Groups(['blog:read'])]
         public bool $subscribed = false,
+        #[Groups(['blog:read'])]
+        public ?string $createdAt = null,
+        #[Groups(['blog:read'])]
+        public ?string $updatedAt = null,
     ) {
         $this->posts = $postsData ?? [];
         $this->blogUsers = $blogUsersData ?? [];

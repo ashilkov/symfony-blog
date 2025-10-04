@@ -2,85 +2,84 @@
 
 namespace App\Blog\Domain\Model;
 
+use App\Blog\Domain\Value\Comment\CommentId;
+use App\Blog\Domain\Value\Common\Content;
+use App\Blog\Domain\Value\Common\UserId;
+use App\Blog\Domain\Value\Post\PostId;
+
 class Comment implements EntityInterface
 {
     public function __construct(
-        private ?int $id = null,
-        private ?int $userId = null,
-        private ?string $content = null,
-        private ?Post $post = null,
-        private ?\DateTimeImmutable $createdAt = null,
-        private ?\DateTimeImmutable $updatedAt = null,
+        private ?CommentId $id = null,
+        private ?UserId $userId = null,
+        private ?Content $content = null,
+        private ?PostId $postId = null,
+        private ?\DateTimeImmutable $createdAt = new \DateTimeImmutable(),
+        private ?\DateTimeImmutable $updatedAt = new \DateTimeImmutable(),
     ) {
     }
 
-    public function setId(?int $id): void
+    public function assignId(CommentId $id): void
     {
         $this->id = $id;
     }
 
-    public function getId(): ?int
+    public function getId(): ?CommentId
     {
         return $this->id;
     }
 
-    public function getUserId(): ?int
+    public function getUserId(): ?UserId
     {
         return $this->userId;
     }
 
-    public function setUserId(?int $userId): static
+    public function assignUser(UserId $userId): self
     {
         $this->userId = $userId;
+        $this->touch();
 
         return $this;
     }
 
-    public function getContent(): ?string
+    public function getContent(): ?Content
     {
         return $this->content;
     }
 
-    public function setContent(string $content): static
+    public function changeContent(Content $content): self
     {
         $this->content = $content;
+        $this->touch();
 
         return $this;
     }
 
-    public function getPost(): ?Post
+    public function getPostId(): ?PostId
     {
-        return $this->post;
+        return $this->postId;
     }
 
-    public function setPost(?Post $post): static
+    public function attachToPost(?PostId $postId): self
     {
-        $this->post = $post;
+        $this->postId = $postId;
+        $this->touch();
 
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
-        return $this->createdAt;
+        return $this->createdAt ?? new \DateTimeImmutable();
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function getUpdatedAt(): \DateTimeImmutable
     {
-        $this->createdAt = $createdAt;
-
-        return $this;
+        return $this->updatedAt ?? new \DateTimeImmutable();
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    private function touch(): void
     {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
+        $this->updatedAt = new \DateTimeImmutable();
     }
 }

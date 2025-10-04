@@ -9,12 +9,11 @@
 
 namespace App\Blog\Domain\Security;
 
-use App\Blog\API\Resource\Blog;
 use App\Blog\API\Resource\Post;
 
 interface PostPermissionPolicyInterface
 {
-    public function canCreatePost(int $userId, Blog $blog): bool;
+    public function canCreatePost(int $userId, int $blogId): bool;
 
     public function canEditPost(int $userId, Post $post): bool;
 

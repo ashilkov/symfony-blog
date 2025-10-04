@@ -38,10 +38,10 @@ services:
     App\Blog\Domain\Repository\BlogRepositoryInterface: '@App\Blog\Infrastructure\Repository\BlogRepository'
     App\Blog\Domain\Repository\BlogUserRepositoryInterface: '@App\Blog\Infrastructure\Repository\BlogUserRepository'
     App\Blog\Domain\Repository\SubscriptionRepositoryInterface: '@App\Blog\Infrastructure\Repository\SubscriptionRepository'
+    App\Blog\Domain\Repository\CommentRepositoryInterface: '@App\Blog\Infrastructure\Repository\CommentRepository'
     App\User\Domain\Repository\UserRepositoryInterface:
         class: App\User\Infrastructure\Repository\UserRepository
         tags: [ 'doctrine.repository_service' ]
-
 
     # Event Listeners
     App\Blog\Infrastructure\Doctrine\Listener\TimestampListener:
@@ -53,5 +53,21 @@ services:
     # Dependency Injection
     App\User\Application\Hydrator\UserHydratorInterface: '@App\User\Application\Hydrator\UserOutputHydrator'
     App\Blog\Application\CurrentUserProviderInterface: '@App\Blog\Infrastructure\Security\CurrentUserProvider'
+    App\Blog\Infrastructure\Repository\PostRepository:
+        arguments:
+            $entityAssembler: '@App\Blog\Infrastructure\Doctrine\Assembler\PostAssembler'
+    App\Blog\Infrastructure\Repository\BlogRepository:
+        public: true
+        arguments:
+            $entityAssembler: '@App\Blog\Infrastructure\Doctrine\Assembler\BlogAssembler'
+    App\Blog\Infrastructure\Repository\BlogUserRepository:
+        arguments:
+            $entityAssembler: '@App\Blog\Infrastructure\Doctrine\Assembler\BlogUserAssembler'
+    App\Blog\Infrastructure\Repository\CommentRepository:
+        arguments:
+            $entityAssembler: '@App\Blog\Infrastructure\Doctrine\Assembler\CommentAssembler'
+    App\Blog\Infrastructure\Repository\SubscriptionRepository:
+        arguments:
+            $entityAssembler: '@App\Blog\Infrastructure\Doctrine\Assembler\SubscriptionAssembler'
 
 

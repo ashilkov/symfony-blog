@@ -11,9 +11,12 @@ namespace App\Blog\Application\Handler\Blog;
 
 use App\Blog\Application\Command\Blog\CreateCommand;
 use App\Blog\Domain\Event\BeforeCreateEvent;
+use App\Blog\Domain\Factory\BlogFactory;
 use App\Blog\Domain\Model\Blog;
 use App\Blog\Domain\Repository\BlogRepositoryInterface;
 use App\Blog\Domain\User\UserReadModelPortInterface;
+use App\Blog\Domain\Value\Blog\BlogDescription;
+use App\Blog\Domain\Value\Blog\BlogName;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 readonly class CreateHandler
@@ -22,6 +25,7 @@ readonly class CreateHandler
         private BlogRepositoryInterface $blogs,
         private UserReadModelPortInterface $userReadModel,
         private EventDispatcherInterface $eventDispatcher,
+        private BlogFactory $blogFactory,
     ) {
     }
 
@@ -36,13 +40,19 @@ readonly class CreateHandler
             throw new \LogicException('User is required to create a blog.');
         }
 
-        $blog = new Blog();
-        if (null !== $command->name) {
-            $blog->setName($command->name);
+        // Ensure required fields are provided and construct Value Objects
+        if (null === $command->name) {
+            throw new \LogicException('Blog name is required.');
         }
-        if (null !== $command->description) {
-            $blog->setDescription($command->description);
+        if (null === $command->description) {
+            throw new \LogicException('Blog description is required.');
         }
+
+        $blogName = new BlogName($command->name);
+        $blogDescription = new BlogDescription($command->description);
+
+        // Create the Blog aggregate via factory with Value Objects
+        $blog = $this->blogFactory->create($blogName, $blogDescription);
 
         $this->eventDispatcher->dispatch(new BeforeCreateEvent($blog, $user));
 

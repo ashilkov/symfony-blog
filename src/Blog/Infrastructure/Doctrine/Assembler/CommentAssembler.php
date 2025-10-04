@@ -11,17 +11,31 @@ namespace App\Blog\Infrastructure\Doctrine\Assembler;
 
 use App\Blog\Domain\Model\Comment as Domain;
 use App\Blog\Domain\Model\EntityInterface;
+use App\Blog\Domain\Value\Comment\CommentId;
+use App\Blog\Domain\Value\Common\Content;
+use App\Blog\Domain\Value\Common\UserId;
+use App\Blog\Domain\Value\Post\PostId;
 use App\Blog\Infrastructure\Doctrine\Entity\Comment as DoctrineEntity;
 use App\Blog\Infrastructure\Doctrine\Entity\DoctrineEntityInterface;
+use App\Blog\Infrastructure\Doctrine\Entity\Post;
+use Doctrine\ORM\EntityManagerInterface;
 
-class CommentAssembler implements AssemblerInterface
+readonly class CommentAssembler implements AssemblerInterface
 {
+
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+    )
+    {
+    }
+
     public function toDomain(DoctrineEntityInterface|DoctrineEntity $entity): Domain
     {
         return new Domain(
-            id: $entity->id,
-            userId: $entity->userId,
-            content: $entity->content,
+            id: new CommentId($entity->id),
+            userId: new UserId($entity->userId),
+            content: new Content($entity->content),
+            postId: new PostId($entity->post->id),
             createdAt: $entity->createdAt,
             updatedAt: $entity->updatedAt,
         );
@@ -32,14 +46,15 @@ class CommentAssembler implements AssemblerInterface
         if (!$entity instanceof Domain) {
             throw new \InvalidArgumentException('Entity must be an instance of Blog');
         }
-        $record = $existingEntity ?? new DoctrineEntity();
+        $doctrineEntity = $existingEntity ?? new DoctrineEntity();
 
-        $record->id = $entity->getId();
-        $record->userId = $entity->getUserId();
-        $record->content = $entity->getContent();
-        $record->createdAt = $entity->getCreatedAt();
-        $record->updatedAt = $entity->getUpdatedAt();
+        $doctrineEntity->id = $entity->getId()?->value();
+        $doctrineEntity->userId = $entity->getUserId()->value();
+        $doctrineEntity->content = $entity->getContent()->value();
+        $doctrineEntity->post = $this->entityManager->getReference(Post::class, $entity->getPostId()->value());
+        $doctrineEntity->createdAt = $entity->getCreatedAt();
+        $doctrineEntity->updatedAt = $entity->getUpdatedAt();
 
-        return $record;
+        return $doctrineEntity;
     }
 }

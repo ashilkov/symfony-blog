@@ -9,6 +9,12 @@
 
 namespace App\Blog\Domain\Model;
 
+use App\Blog\Domain\Value\Blog\BlogId;
+use App\Blog\Domain\Value\Common\Content;
+use App\Blog\Domain\Value\Common\UserId;
+use App\Blog\Domain\Value\Post\PostId;
+use App\Blog\Domain\Value\Post\PostTitle;
+
 class Post implements EntityInterface
 {
     /**
@@ -16,100 +22,94 @@ class Post implements EntityInterface
      */
     private array $comments = [];
 
-    private ?Blog $blog = null;
-
     public function __construct(
-        private ?int $id = null,
-        private ?string $title = null,
-        private ?string $content = null,
-        private ?int $userId = null,
-        private ?\DateTimeImmutable $createdAt = null,
-        private ?\DateTimeImmutable $updatedAt = null,
+        private ?PostId $id = null,
+        private ?PostTitle $title = null,
+        private ?Content $content = null,
+        private ?UserId $userId = null,
+        private ?BlogId $blogId = null,
+        private ?\DateTimeImmutable $createdAt = new \DateTimeImmutable(),
+        private ?\DateTimeImmutable $updatedAt = new \DateTimeImmutable(),
     ) {
     }
 
-    public function setId(?int $id): void
+    public function assignId(PostId $id): void
     {
         $this->id = $id;
     }
 
-    public function getId(): ?int
+    public function getId(): ?PostId
     {
         return $this->id;
     }
 
-    public function getContent(): ?string
+    public function getContent(): ?Content
     {
         return $this->content;
     }
 
-    public function setContent(string $content): static
+    public function changeContent(Content $content): static
     {
         $this->content = $content;
+        $this->touch();
 
         return $this;
     }
 
-    public function getUserId(): ?int
+    public function getAuthorId(): ?UserId
     {
         return $this->userId;
     }
 
-    public function setUserId(?int $userId): static
+    public function assignAuthor(UserId $userId): static
     {
         $this->userId = $userId;
+        $this->touch();
 
         return $this;
     }
 
-    public function getBlog(): ?Blog
+    public function getBlogId(): ?BlogId
     {
-        return $this->blog;
+        return $this->blogId;
     }
 
-    public function setBlog(?Blog $blog): static
+    public function attachToBlog(BlogId $blogId): static
     {
-        $this->blog = $blog;
+        $this->blogId = $blogId;
+        $this->touch();
 
         return $this;
     }
 
-    public function getTitle(): ?string
+    public function getTitle(): ?PostTitle
     {
         return $this->title;
     }
 
-    public function setTitle(string $title): static
+    public function rename(PostTitle $title): static
     {
-        $this->title = $title;
+        if (true !== $this->title?->equals($title)) {
+            $this->title = $title;
+            $this->touch();
+        }
 
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
-        return $this->createdAt;
+        return $this->createdAt ?? new \DateTimeImmutable();
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function getUpdatedAt(): \DateTimeImmutable
     {
-        $this->createdAt = $createdAt;
-
-        return $this;
+        return $this->updatedAt ?? new \DateTimeImmutable();
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
+    /**
+     * @return iterable<Comment>
+     */
     public function getComments(): iterable
     {
         return $this->comments;
@@ -117,24 +117,33 @@ class Post implements EntityInterface
 
     public function addComment(Comment $comment): static
     {
-        if (isset($this->comments[$comment->getId()])) {
+        $key = (string) $comment->getId();
+        if (isset($this->comments[$key])) {
             return $this;
         }
 
-        $this->comments[$comment->getId()] = $comment;
-        $comment->setPost($this);
+        $this->comments[$key] = $comment;
+        $comment->attachToPost($this->getId());
+        $this->touch();
 
         return $this;
     }
 
     public function removeComment(Comment $comment): static
     {
-        if (!isset($this->comments[$comment->getId()])) {
+        $key = (string) $comment->getId();
+        if (!isset($this->comments[$key])) {
             return $this;
         }
 
-        unset($this->comments[$comment->getId()]);
+        unset($this->comments[$key]);
+        $this->touch();
 
         return $this;
+    }
+
+    private function touch(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 }

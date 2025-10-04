@@ -9,7 +9,6 @@
 
 namespace App\Blog\Infrastructure\Security\Post;
 
-use App\Blog\API\Resource\Blog;
 use App\Blog\API\Resource\Post;
 use App\Blog\Domain\Enum\BlogUserRole;
 use App\Blog\Domain\Model\Post as PostDomain;
@@ -25,21 +24,18 @@ readonly class PostPermissionPolicy implements PostPermissionPolicyInterface
     ) {
     }
 
-    public function canCreatePost(int $userId, Blog $blog): bool
+    public function canCreatePost(int $userId, int $blogId): bool
     {
-        $role = $this->getRole($userId, $blog);
+        $role = $this->getRole($userId, $blogId);
 
         return in_array($role, [BlogUserRole::ROLE_AUTHOR, BlogUserRole::ROLE_EDITOR, BlogUserRole::ROLE_ADMIN], true);
     }
 
     public function canEditPost(int $userId, Post $post): bool
     {
-        $blog = $post->blog;
-        if (!$blog instanceof Blog) {
-            return false;
-        }
+        $blogId = $post->blogId;
+        $role = $this->getRole($userId, $blogId);
 
-        $role = $this->getRole($userId, $blog);
         if (\in_array($role, [BlogUserRole::ROLE_EDITOR, BlogUserRole::ROLE_ADMIN], true)) {
             return true;
         }
@@ -54,7 +50,7 @@ readonly class PostPermissionPolicy implements PostPermissionPolicyInterface
                 return false;
             }
 
-            return $domainPost->getUserId() === $userId;
+            return $domainPost->getAuthorId()->value() === $userId;
         }
 
         return false;
@@ -62,21 +58,17 @@ readonly class PostPermissionPolicy implements PostPermissionPolicyInterface
 
     public function canDeletePost(int $userId, Post $post): bool
     {
-        $blog = $post->blog;
-        if (!$blog instanceof Blog) {
-            return false;
-        }
-
-        $role = $this->getRole($userId, $blog);
+        $blogId = $post->blogId;
+        $role = $this->getRole($userId, $blogId);
 
         return \in_array($role, [BlogUserRole::ROLE_EDITOR, BlogUserRole::ROLE_ADMIN], true);
     }
 
-    private function getRole(int $userId, Blog $blog): ?BlogUserRole
+    private function getRole(int $userId, int $blogId): ?BlogUserRole
     {
         $blogUser = $this->blogUserRepository->findOneBy([
             'userId' => $userId,
-            'blog' => $blog->id,
+            'blog' => $blogId,
         ]);
 
         return $blogUser?->getRole();

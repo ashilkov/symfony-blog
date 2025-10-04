@@ -17,8 +17,10 @@ class BlogUserHydrator
     public function hydrate(BlogUser $blogUser): BlogUserResource
     {
         return new BlogUserResource(
+            id: sprintf('%s-%s', $blogUser->getBlogId()->value(), $blogUser->getUserId()->value()),
             role: $blogUser->getRole(),
-            userId: $blogUser->getUserId(),
+            blogId: $blogUser->getBlogId()->value(),
+            userId: $blogUser->getUserId()->value(),
         );
     }
 }

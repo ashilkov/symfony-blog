@@ -12,6 +12,8 @@ namespace App\Blog\Application\Handler\Post;
 use App\Blog\Application\Command\Post\UpdateCommand;
 use App\Blog\Domain\Model\Post;
 use App\Blog\Domain\Repository\PostRepositoryInterface;
+use App\Blog\Domain\Value\Common\Content;
+use App\Blog\Domain\Value\Post\PostTitle;
 
 readonly class UpdateHandler
 {
@@ -29,10 +31,10 @@ readonly class UpdateHandler
         }
 
         if (null !== $command->title) {
-            $post->setTitle($command->title);
+            $post->rename(new PostTitle($command->title));
         }
         if (null !== $command->content) {
-            $post->setContent($command->content);
+            $post->changeContent(new Content($command->content));
         }
 
         $this->posts->save($post, true);

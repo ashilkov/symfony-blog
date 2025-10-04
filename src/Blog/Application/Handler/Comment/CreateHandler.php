@@ -10,11 +10,15 @@
 namespace App\Blog\Application\Handler\Comment;
 
 use App\Blog\Application\Command\Comment\CreateCommand;
+use App\Blog\Domain\Factory\CommentFactory;
 use App\Blog\Domain\Model\Comment;
 use App\Blog\Domain\Model\Post;
 use App\Blog\Domain\Repository\CommentRepositoryInterface;
 use App\Blog\Domain\Repository\PostRepositoryInterface;
 use App\Blog\Domain\User\UserReadModelPortInterface;
+use App\Blog\Domain\Value\Common\Content;
+use App\Blog\Domain\Value\Common\UserId;
+use App\Blog\Domain\Value\Post\PostId;
 
 readonly class CreateHandler
 {
@@ -22,6 +26,7 @@ readonly class CreateHandler
         private UserReadModelPortInterface $userReadModel,
         private CommentRepositoryInterface $commentRepository,
         private PostRepositoryInterface $postRepository,
+        private CommentFactory $commentFactory,
     ) {
     }
 
@@ -42,10 +47,11 @@ readonly class CreateHandler
             throw new \LogicException('Post is required to create a comment.');
         }
 
-        $comment = new Comment();
-        $comment->setPost($post);
-        $comment->setUserId($command->userId);
-        $comment->setContent($command->content);
+        $comment = $this->commentFactory->create(
+            new Content($command->content),
+            new UserId($command->userId),
+            new PostId($command->postId),
+        );
 
         $this->commentRepository->save($comment, true);
 

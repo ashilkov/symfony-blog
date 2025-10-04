@@ -9,72 +9,69 @@
 
 namespace App\Blog\Domain\Model;
 
+use App\Blog\Domain\Value\Blog\BlogId;
+use App\Blog\Domain\Value\Common\UserId;
+use App\Blog\Domain\Value\Subscription\SubscriptionId;
+
 class Subscription implements EntityInterface
 {
     public function __construct(
-        private ?int $id = null,
-        private ?Blog $blog = null,
-        private ?int $subscriberId = null,
-        private ?\DateTimeImmutable $createdAt = null,
-        private ?\DateTimeImmutable $updatedAt = null,
+        private ?SubscriptionId $id = null,
+        private ?BlogId $blogId = null,
+        private ?UserId $subscriberId = null,
+        private ?\DateTimeImmutable $createdAt = new \DateTimeImmutable(),
+        private ?\DateTimeImmutable $updatedAt = new \DateTimeImmutable(),
     ) {
     }
 
-    public function setId(?int $id): void
+    public function assignId(SubscriptionId $id): void
     {
         $this->id = $id;
     }
 
-    public function getId(): ?int
+    public function getId(): ?SubscriptionId
     {
         return $this->id;
     }
 
-    public function getBlog(): ?Blog
+    public function getBlogId(): ?BlogId
     {
-        return $this->blog;
+        return $this->blogId;
     }
 
-    public function setBlog(?Blog $blog): static
+    public function attachToBlog(BlogId $blogId): static
     {
-        $this->blog = $blog;
+        $this->blogId = $blogId;
+        $this->touch();
 
         return $this;
     }
 
-    public function getSubscriberId(): ?int
+    public function getSubscriberId(): ?UserId
     {
         return $this->subscriberId;
     }
 
-    public function setSubscriberId(?int $subscriberId): static
+    public function assignSubscriber(UserId $subscriberId): static
     {
         $this->subscriberId = $subscriberId;
+        $this->touch();
 
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
-        return $this->createdAt;
+        return $this->createdAt ?? new \DateTimeImmutable();
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function getUpdatedAt(): \DateTimeImmutable
     {
-        $this->createdAt = $createdAt;
-
-        return $this;
+        return $this->updatedAt ?? new \DateTimeImmutable();
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    private function touch(): void
     {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
+        $this->updatedAt = new \DateTimeImmutable();
     }
 }

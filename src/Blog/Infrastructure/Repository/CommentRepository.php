@@ -9,7 +9,9 @@
 
 namespace App\Blog\Infrastructure\Repository;
 
+use App\Blog\Domain\Model\EntityInterface;
 use App\Blog\Domain\Repository\CommentRepositoryInterface;
+use App\Blog\Domain\Value\Comment\CommentId;
 use App\Blog\Infrastructure\Doctrine\Entity\Comment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -21,5 +23,14 @@ class CommentRepository extends AbstractRepository implements CommentRepositoryI
     public function getEntityType(): string
     {
         return Comment::class;
+    }
+
+    protected function saveAfter(EntityInterface $entity, object $doctrineEntity): void
+    {
+        parent::saveAfter($entity, $doctrineEntity);
+
+        if (method_exists($entity, 'assignId') && property_exists($doctrineEntity, 'id')) {
+            $entity->assignId(new CommentId($doctrineEntity->id));
+        }
     }
 }

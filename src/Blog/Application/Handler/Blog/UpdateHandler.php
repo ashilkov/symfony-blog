@@ -12,6 +12,8 @@ namespace App\Blog\Application\Handler\Blog;
 use App\Blog\Application\Command\Blog\UpdateCommand;
 use App\Blog\Domain\Model\Blog;
 use App\Blog\Domain\Repository\BlogRepositoryInterface;
+use App\Blog\Domain\Value\Blog\BlogDescription;
+use App\Blog\Domain\Value\Blog\BlogName;
 
 readonly class UpdateHandler
 {
@@ -29,10 +31,10 @@ readonly class UpdateHandler
         }
 
         if (null !== $command->name) {
-            $blog->setName($command->name);
+            $blog->rename(new BlogName($command->name));
         }
         if (null !== $command->description) {
-            $blog->setDescription($command->description);
+            $blog->setDescription(new BlogDescription($command->description));
         }
 
         $this->blogs->save($blog, true);

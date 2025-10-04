@@ -13,7 +13,7 @@ use App\Blog\API\Resource\Post;
 use App\Blog\Domain\Enum\Actions;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class AllowedActionsResolver
+readonly class AllowedActionsResolver
 {
     public function __construct(private AuthorizationCheckerInterface $auth)
     {

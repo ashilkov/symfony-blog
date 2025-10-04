@@ -15,7 +15,9 @@
             <generator strategy="AUTO"/>
         </id>
 
-        <field name="blogId" type="integer" column="blog_id" nullable="true"/>
+        <many-to-one field="blog" target-entity="App\Blog\Infrastructure\Doctrine\Entity\Blog" inversed-by="subscriptions">
+            <join-column name="blog_id" referenced-column-name="id" nullable="false" on-delete="CASCADE"/>
+        </many-to-one>
         <field name="subscriberId" type="integer" column="user_id" nullable="false"/>
         <field name="createdAt" type="datetime_immutable" column="created_at" nullable="true"/>
         <field name="updatedAt" type="datetime_immutable" column="updated_at" nullable="true"/>

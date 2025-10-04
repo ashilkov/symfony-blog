@@ -10,11 +10,16 @@
 namespace App\Blog\Application\Handler\Post;
 
 use App\Blog\Application\Command\Post\CreateCommand;
+use App\Blog\Domain\Factory\PostFactory;
 use App\Blog\Domain\Model\Blog;
 use App\Blog\Domain\Model\Post;
 use App\Blog\Domain\Repository\BlogRepositoryInterface;
 use App\Blog\Domain\Repository\PostRepositoryInterface;
 use App\Blog\Domain\User\UserReadModelPortInterface;
+use App\Blog\Domain\Value\Blog\BlogId;
+use App\Blog\Domain\Value\Common\Content;
+use App\Blog\Domain\Value\Common\UserId;
+use App\Blog\Domain\Value\Post\PostTitle;
 
 readonly class CreateHandler
 {
@@ -22,13 +27,12 @@ readonly class CreateHandler
         private PostRepositoryInterface $posts,
         private UserReadModelPortInterface $userReadModel,
         private BlogRepositoryInterface $blogs,
+        private PostFactory $postFactory,
     ) {
     }
 
     public function __invoke(CreateCommand $command): Post
     {
-        $post = new Post();
-
         if (null === $command->userId) {
             throw new \LogicException('User is required to create a blog.');
         }
@@ -44,15 +48,12 @@ readonly class CreateHandler
             throw new \LogicException('Blog is required to create a post.');
         }
 
-        $post->setUserId($user->id);
-
-        if (null !== $command->title) {
-            $post->setTitle($command->title);
-        }
-        if (null !== $command->content) {
-            $post->setContent($command->content);
-        }
-        $post->setBlog($blog);
+        $post = $this->postFactory->create(
+            new PostTitle($command->title),
+            new Content($command->content),
+            new UserId($command->userId),
+            new BlogId($command->blogId)
+        );
 
         $this->posts->save($post, true);
 

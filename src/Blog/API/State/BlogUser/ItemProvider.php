@@ -11,7 +11,6 @@ namespace App\Blog\API\State\BlogUser;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Blog\API\Hydrator\BlogHydrator;
 use App\Blog\API\Hydrator\BlogUserHydrator;
 use App\Blog\API\Resource\BlogUser as BlogUserResource;
 use App\Blog\Domain\Model\BlogUser;
@@ -22,7 +21,6 @@ readonly class ItemProvider implements ProviderInterface
     public function __construct(
         private BlogUserRepositoryInterface $blogUserRepository,
         private BlogUserHydrator $blogUserHydrator,
-        private BlogHydrator $blogHydrator,
     ) {
     }
 
@@ -45,9 +43,6 @@ readonly class ItemProvider implements ProviderInterface
             return null;
         }
 
-        $blogUserResource = $this->blogUserHydrator->hydrate($blogUser);
-        $blogUserResource->blog = $this->blogHydrator->hydrate($blogUser->getBlog());
-
-        return $blogUserResource;
+        return $this->blogUserHydrator->hydrate($blogUser);
     }
 }

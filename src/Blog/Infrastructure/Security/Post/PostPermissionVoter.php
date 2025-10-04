@@ -48,7 +48,7 @@ class PostPermissionVoter extends Voter
         $post = $subject;
 
         return match ($attribute) {
-            self::CREATE_POST => $post->blog && $this->policy->canCreatePost($userId, $post->blog),
+            self::CREATE_POST => $post->blogId && $this->policy->canCreatePost($userId, $post->blogId),
             self::EDIT_POST => $this->policy->canEditPost($userId, $post),
             self::DELETE_POST => $this->policy->canDeletePost($userId, $post),
             default => false,

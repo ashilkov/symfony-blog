@@ -15,19 +15,26 @@ use App\Blog\Domain\User\UserReadModelPortInterface;
 
 readonly class PostHydrator
 {
-    public function __construct(private UserReadModelPortInterface $userReadModelPort)
-    {
+    public function __construct(
+        private UserReadModelPortInterface $userReadModelPort,
+        private CommentHydrator $commentHydrator,
+    ) {
     }
 
     public function hydrate(Post $post): PostResource
     {
-        return new PostResource(
-            id: $post->getId(),
-            title: $post->getTitle(),
-            content: $post->getContent(),
+        $postResource = new PostResource(
+            id: $post->getId()->value(),
+            title: $post->getTitle()->value(),
+            content: $post->getContent()->value(),
             createdAt: $post->getCreatedAt()?->format('Y-m-d H:i:s'),
             updatedAt: $post->getUpdatedAt()?->format('Y-m-d H:i:s'),
-            author: $this->userReadModelPort->findSummaryById($post->getUserId())->username
+            blogId: $post->getBlogId()->value(),
+            author: $this->userReadModelPort->findSummaryById($post->getAuthorId()->value())->username,
         );
+
+        $postResource->comments = array_map(fn ($comment) => $this->commentHydrator->hydrate($comment), $post->getComments());
+
+        return $postResource;
     }
 }

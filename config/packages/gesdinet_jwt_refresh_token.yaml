@@ -1,2 +1,2 @@
 gesdinet_jwt_refresh_token:
-    refresh_token_class: App\User\Domain\Model\RefreshToken
+    refresh_token_class: App\User\Infrastructure\Doctrine\Entity\RefreshToken

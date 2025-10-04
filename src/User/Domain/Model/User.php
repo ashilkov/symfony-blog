@@ -10,8 +10,6 @@
 namespace App\User\Domain\Model;
 
 use App\User\Domain\Enum\UserRole;
-use App\User\Domain\Repository\UserRepositoryInterface;
-use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 

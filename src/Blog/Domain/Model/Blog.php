@@ -9,6 +9,10 @@
 
 namespace App\Blog\Domain\Model;
 
+use App\Blog\Domain\Value\Blog\BlogDescription;
+use App\Blog\Domain\Value\Blog\BlogId;
+use App\Blog\Domain\Value\Blog\BlogName;
+
 class Blog implements EntityInterface
 {
     /**
@@ -27,48 +31,56 @@ class Blog implements EntityInterface
     private array $subscriptions = [];
 
     public function __construct(
-        private ?int $id = null,
-        private ?string $name = null,
-        private ?string $description = null,
-        private ?\DateTimeImmutable $createdAt = null,
-        private ?\DateTimeImmutable $updatedAt = null,
+        private ?BlogId $id = null,
+        private ?BlogName $name = null,
+        private ?BlogDescription $description = null,
+        private ?\DateTimeImmutable $createdAt = new \DateTimeImmutable(),
+        private ?\DateTimeImmutable $updatedAt = new \DateTimeImmutable(),
     ) {
     }
 
-    public function setId(?int $id): void
+    public function assignId(?BlogId $id): void
     {
         $this->id = $id;
     }
 
-    public function getId(): ?int
+    public function getId(): ?BlogId
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): ?BlogName
     {
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function rename(BlogName $name): static
     {
-        $this->name = $name;
+        if (!$this->name->equals($name)) {
+            $this->name = $name;
+            $this->touch();
+        }
 
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getDescription(): ?BlogDescription
     {
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(BlogDescription $description): static
     {
-        $this->description = $description;
+        $isChanged = ($this->description?->value() ?? null) !== ($description?->value() ?? null);
+        if ($isChanged) {
+            $this->description = $description;
+            $this->touch();
+        }
 
         return $this;
     }
 
+    /** @return iterable<BlogUser> */
     public function getBlogUsers(): iterable
     {
         return $this->blogUsers;
@@ -76,18 +88,20 @@ class Blog implements EntityInterface
 
     public function addBlogUser(BlogUser $blogUser): self
     {
-        if (isset($this->blogUsers[$blogUser->getUserId()])) {
+        if (isset($this->blogUsers[$blogUser->getUserId()->value()])) {
             return $this;
         }
-        $blogUser->setBlog($this);
-        $this->blogUsers[$blogUser->getUserId()] = $blogUser;
+        if (null !== $this->getId()) {
+            $blogUser->attachToBlog($this->getId());
+        }
+        $this->blogUsers[$blogUser->getUserId()->value()] = $blogUser;
 
         return $this;
     }
 
     public function removeBlogUser(BlogUser $blogUser): self
     {
-        if (!isset($this->blogUsers[$blogUser->getUserId()])) {
+        if (!isset($this->blogUsers[$blogUser->getUserId()->value()])) {
             return $this;
         }
         unset($this->blogUsers[$blogUser->getUserId()]);
@@ -103,21 +117,23 @@ class Blog implements EntityInterface
 
     public function addPost(Post $post): static
     {
-        if (isset($this->posts[$post->getId()])) {
+        if (isset($this->posts[$post->getId()->value()])) {
             return $this;
         }
-        $this->posts[$post->getId()] = $post;
-        $post->setBlog($this);
+        $this->posts[$post->getId()->value()] = $post;
+        if (null !== $this->getId()) {
+            $post->attachToBlog($this->getId());
+        }
 
         return $this;
     }
 
     public function removePost(Post $post): static
     {
-        if (!isset($this->posts[$post->getId()])) {
+        if (!isset($this->posts[$post->getId()->value()])) {
             return $this;
         }
-        unset($this->posts[$post->getId()]);
+        unset($this->posts[$post->getId()->value()]);
 
         return $this;
     }
@@ -130,21 +146,21 @@ class Blog implements EntityInterface
 
     public function addSubscription(Subscription $subscription): static
     {
-        if (isset($this->subscriptions[$subscription->getId()])) {
+        if (isset($this->subscriptions[$subscription->getId()->value()])) {
             return $this;
         }
-        $subscription->setBlog($this);
-        $this->subscriptions[$subscription->getId()] = $subscription;
+        $subscription->attachToBlog($this->getId());
+        $this->subscriptions[$subscription->getId()->value()] = $subscription;
 
         return $this;
     }
 
     public function removeSubscription(Subscription $subscription): static
     {
-        if (!isset($this->subscriptions[$subscription->getId()])) {
+        if (!isset($this->subscriptions[$subscription->getId()->value()])) {
             return $this;
         }
-        unset($this->subscriptions[$subscription->getId()]);
+        unset($this->subscriptions[$subscription->getId()->value()]);
 
         return $this;
     }
@@ -154,22 +170,13 @@ class Blog implements EntityInterface
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    private function touch(): void
     {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
+        $this->updatedAt = new \DateTimeImmutable();
     }
 }

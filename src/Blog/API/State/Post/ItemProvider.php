@@ -11,20 +11,16 @@ namespace App\Blog\API\State\Post;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Blog\API\Hydrator\BlogHydrator;
-use App\Blog\API\Hydrator\CommentHydrator;
 use App\Blog\API\Hydrator\PostHydrator;
 use App\Blog\API\Resource\Post;
 use App\Blog\Domain\Repository\PostRepositoryInterface;
 use App\Blog\Infrastructure\Security\Post\AllowedActionsResolver;
 
-class ItemProvider implements ProviderInterface
+readonly class ItemProvider implements ProviderInterface
 {
     public function __construct(
         private PostRepositoryInterface $postRepository,
-        private BlogHydrator $blogHydrator,
         private PostHydrator $postHydrator,
-        private CommentHydrator $commentHydrator,
         private AllowedActionsResolver $allowedActionsResolver,
     ) {
     }
@@ -43,9 +39,7 @@ class ItemProvider implements ProviderInterface
         }
 
         $postResource = $this->postHydrator->hydrate($post);
-        $postResource->blog = $this->blogHydrator->hydrate($post->getBlog());
         $postResource->allowedActions = $this->allowedActionsResolver->resolve($postResource);
-        $postResource->comments = array_map(fn ($comment) => $this->commentHydrator->hydrate($comment), $post->getComments());
 
         return $postResource;
     }

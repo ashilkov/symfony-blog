@@ -10,38 +10,53 @@
 namespace App\Blog\Domain\Model;
 
 use App\Blog\Domain\Enum\BlogUserRole;
+use App\Blog\Domain\Value\Blog\BlogId;
+use App\Blog\Domain\Value\Common\UserId;
 
 class BlogUser implements EntityInterface
 {
     public function __construct(
-        private ?int $userId = null,
+        private ?UserId $userId = null,
         private ?BlogUserRole $role = null,
-        private ?Blog $blog = null,
+        private ?BlogId $blogId = null,
     ) {
     }
 
-    public function getBlog(): Blog
+    public function getBlogId(): ?BlogId
     {
-        return $this->blog;
+        return $this->blogId;
     }
 
-    public function setBlog(Blog $blog): void
+    public function attachToBlog(BlogId $blogId): self
     {
-        $this->blog = $blog;
+        $this->blogId = $blogId;
+
+        return $this;
     }
 
-    public function getUserId(): ?int
+    public function getUserId(): ?UserId
     {
         return $this->userId;
     }
 
-    public function getRole(): BlogUserRole
+    public function assignUser(UserId $userId): self
+    {
+        $this->userId = $userId;
+
+        return $this;
+    }
+
+    public function getRole(): ?BlogUserRole
     {
         return $this->role;
     }
 
-    public function setRole(BlogUserRole $role): void
+    public function changeRole(BlogUserRole $role): self
     {
-        $this->role = $role;
+        if ($this->role !== $role) {
+            $this->role = $role;
+        }
+
+        return $this;
     }
 }

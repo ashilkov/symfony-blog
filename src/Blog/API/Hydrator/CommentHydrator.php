@@ -22,10 +22,10 @@ class CommentHydrator
     public function hydrate(Comment $comment): CommentResource
     {
         return new CommentResource(
-            id: $comment->getId(),
-            author: $this->userReadModelPort->findSummaryById($comment->getUserId())->username,
-            postId: $comment->getPost()->getId(),
-            content: $comment->getContent(),
+            id: $comment->getId()->value(),
+            author: $this->userReadModelPort->findSummaryById($comment->getUserId()->value())->username,
+            postId: $comment->getPostId()->value(),
+            content: $comment->getContent()->value(),
             createdAt: $comment->getCreatedAt()->format('Y-m-d H:i:s'),
             updatedAt: $comment->getUpdatedAt()->format('Y-m-d H:i:s'),
         );

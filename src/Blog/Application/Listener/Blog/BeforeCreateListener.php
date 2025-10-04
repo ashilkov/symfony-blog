@@ -13,6 +13,7 @@ use App\Blog\Domain\Enum\BlogUserRole;
 use App\Blog\Domain\Event\BeforeCreateEvent;
 use App\Blog\Domain\Model\BlogUser;
 use App\Blog\Domain\User\UserReadModelPortInterface;
+use App\Blog\Domain\Value\Common\UserId;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 #[AsEventListener(event: BeforeCreateEvent::class, method: '__invoke')]
@@ -39,9 +40,9 @@ class BeforeCreateListener
         }
 
         $blogUser = new BlogUser(
-            userId: $event->user->id,
+            userId: new UserId($event->user->id),
             role: BlogUserRole::ROLE_ADMIN,
-            blog: $blog
+            blogId: $blog->getId()
         );
 
         $blog->addBlogUser($blogUser);

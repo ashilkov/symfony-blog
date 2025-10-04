@@ -11,16 +11,26 @@ namespace App\Blog\Infrastructure\Doctrine\Assembler;
 
 use App\Blog\Domain\Model\EntityInterface;
 use App\Blog\Domain\Model\Subscription as Domain;
+use App\Blog\Domain\Value\Blog\BlogId;
+use App\Blog\Domain\Value\Common\UserId;
+use App\Blog\Domain\Value\Subscription\SubscriptionId;
+use App\Blog\Infrastructure\Doctrine\Entity\Blog;
 use App\Blog\Infrastructure\Doctrine\Entity\DoctrineEntityInterface;
 use App\Blog\Infrastructure\Doctrine\Entity\Subscription as DoctrineEntity;
+use Doctrine\ORM\EntityManagerInterface;
 
 class SubscriptionAssembler implements AssemblerInterface
 {
+    public function __construct(private readonly EntityManagerInterface $entityManager)
+    {
+    }
+
     public function toDomain(DoctrineEntityInterface|DoctrineEntity $entity): Domain
     {
         return new Domain(
-            id: $entity->id,
-            subscriberId: $entity->subscriberId,
+            id: new SubscriptionId($entity->id),
+            blogId: new BlogId($entity->blog->id),
+            subscriberId: new UserId($entity->subscriberId),
             createdAt: $entity->createdAt,
             updatedAt: $entity->updatedAt
         );
@@ -33,8 +43,9 @@ class SubscriptionAssembler implements AssemblerInterface
         }
         $doctrineEntity = $existingEntity ?? new DoctrineEntity();
 
-        $doctrineEntity->id = $entity->getId();
-        $doctrineEntity->subscriberId = $entity->getSubscriberId();
+        $doctrineEntity->id = $entity->getId()?->value();
+        $doctrineEntity->subscriberId = $entity->getSubscriberId()->value();
+        $doctrineEntity->blog = $this->entityManager->getReference(Blog::class, $entity->getBlogId()->value());
         $doctrineEntity->createdAt = $entity->getCreatedAt();
         $doctrineEntity->updatedAt = $entity->getUpdatedAt();
 

@@ -10,7 +10,7 @@
 namespace App\Blog\Infrastructure\Repository;
 
 use App\Blog\Domain\Model\EntityInterface;
-use App\Blog\Infrastructure\Doctrine\Assembler\EntityAssembler;
+use App\Blog\Infrastructure\Doctrine\Assembler\AssemblerInterface;
 use App\Blog\Infrastructure\Doctrine\Entity\DoctrineEntityInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\LockMode;
@@ -21,7 +21,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
 {
     public function __construct(
         protected readonly EntityManagerInterface $entityManager,
-        protected readonly EntityAssembler $entityAssembler,
+        protected readonly AssemblerInterface $entityAssembler,
         ManagerRegistry $registry,
     ) {
         parent::__construct($registry, $this->getEntityType());
@@ -57,7 +57,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
     {
         $existing = null;
         if ($entity->getId()) {
-            $existing = parent::find($entity->getId());
+            $existing = parent::find($entity->getId()->value());
         }
         $doctrineEntity = $this->entityAssembler->toDoctrineEntity($entity, $existing);
 
@@ -73,7 +73,11 @@ abstract class AbstractRepository extends ServiceEntityRepository
 
     public function remove(EntityInterface $entity, bool $flush = false): void
     {
-        $doctrineEntity = $this->entityAssembler->toDoctrineEntity($entity);
+        $existing = null;
+        if ($entity->getId()) {
+            $existing = parent::find($entity->getId()->value());
+        }
+        $doctrineEntity = $this->entityAssembler->toDoctrineEntity($entity, $existing);
 
         $this->entityManager->remove($doctrineEntity);
         if ($flush) {
@@ -89,10 +93,6 @@ abstract class AbstractRepository extends ServiceEntityRepository
 
     protected function saveAfter(EntityInterface $entity, object $doctrineEntity): void
     {
-        if (method_exists($entity, 'setId') && property_exists($doctrineEntity, 'id')) {
-            $entity->setId($doctrineEntity->id);
-        }
-
         if (method_exists($entity, 'setCreatedAt')
             && property_exists($doctrineEntity, 'createdAt')
             && null !== $doctrineEntity->createdAt

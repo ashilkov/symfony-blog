@@ -17,9 +17,9 @@ class SubscriptionHydrator
     public function hydrate(Subscription $subscription): SubscriptionResource
     {
         return new SubscriptionResource(
-            id: $subscription->getId(),
-            blogId: $subscription->getBlog()->getId(),
-            subscriberId: $subscription->getSubscriberId()
+            id: $subscription->getId()->value(),
+            blogId: $subscription->getBlogId()->value(),
+            subscriberId: $subscription->getSubscriberId()->value()
         );
     }
 }

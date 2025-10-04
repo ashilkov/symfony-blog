@@ -53,7 +53,7 @@ readonly class DeleteProcessor implements ProcessorInterface
         // If you hydrate and return this resource, GraphQL won’t need to read after deletion.
         $resource = $this->hydrator->hydrate($subscription);
 
-        ($this->handler)(new DeleteCommand((int) $subscription->getId()));
+        ($this->handler)(new DeleteCommand((int) $subscription->getId()->value()));
 
         return $resource;
     }
