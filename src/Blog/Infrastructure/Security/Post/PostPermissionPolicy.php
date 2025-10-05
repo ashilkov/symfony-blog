@@ -33,7 +33,7 @@ readonly class PostPermissionPolicy implements PostPermissionPolicyInterface
 
     public function canEditPost(int $userId, Post $post): bool
     {
-        $blogId = $post->blogId;
+        $blogId = $post->blog->id;
         $role = $this->getRole($userId, $blogId);
 
         if (\in_array($role, [BlogUserRole::ROLE_EDITOR, BlogUserRole::ROLE_ADMIN], true)) {
@@ -58,7 +58,7 @@ readonly class PostPermissionPolicy implements PostPermissionPolicyInterface
 
     public function canDeletePost(int $userId, Post $post): bool
     {
-        $blogId = $post->blogId;
+        $blogId = $post->blog->id;
         $role = $this->getRole($userId, $blogId);
 
         return \in_array($role, [BlogUserRole::ROLE_EDITOR, BlogUserRole::ROLE_ADMIN], true);

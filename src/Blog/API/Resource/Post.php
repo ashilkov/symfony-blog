@@ -103,7 +103,7 @@ class Post
         #[Groups(['post:read', 'post:write', 'blog:read'])]
         public ?string $updatedAt = null,
         #[Groups(['post:read', 'post:write'])]
-        public ?int $blogId = null,
+        public ?Blog $blog = null,
         #[Groups(['post:read'])]
         public ?string $author = null,
         #[Groups(['post:read'])]

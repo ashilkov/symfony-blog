@@ -43,7 +43,7 @@ readonly class CreateProcessor implements ProcessorInterface
         $command = new CreateCommand(
             title: $data->title,
             content: $data->content,
-            blogId: $data->blogId,
+            blogId: $data->blog->id,
             userId: $userId,
         );
         $post = ($this->handler)($command);

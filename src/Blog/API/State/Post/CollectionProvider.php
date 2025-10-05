@@ -26,10 +26,11 @@ readonly class CollectionProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $blogId = $uriVariables['blog_id'] ?? null;
+        $order = ['createdAt' => 'DESC'];
         if ($blogId) {
-            $posts = $this->postRepository->findBy(['blog' => $blogId]);
+            $posts = $this->postRepository->findBy(['blog' => $blogId], $order, 30);
         } else {
-            $posts = $this->postRepository->findBy([]);
+            $posts = $this->postRepository->findBy([], $order, 30);
         }
 
         /** @var \App\Blog\Domain\Model\Post[] $posts */

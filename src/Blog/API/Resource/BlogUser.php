@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use ApiPlatform\Metadata\Link;
 use App\Blog\API\State\BlogUser\CollectionProvider as BlogUserCollectionProvider;
 use App\Blog\API\State\BlogUser\ItemProvider as BlogUserItemProvider;
 use App\Blog\Domain\Enum\BlogUserRole;
@@ -23,9 +24,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            provider: BlogUserCollectionProvider::class
+            uriTemplate: '/blogs/{blogId}/members',
+            uriVariables: [
+                'blogId' => new Link(fromProperty: 'blogUsers', fromClass: Blog::class, identifiers: ['id']),
+            ],
+            provider: BlogUserCollectionProvider::class,
         ),
         new Get(
+            uriTemplate: '/blogs/{blogId}/members/{userId}',
             provider: BlogUserItemProvider::class
         ),
     ],
@@ -45,13 +51,12 @@ class BlogUser
     public function __construct(
         #[ApiProperty(identifier: true)]
         #[Groups(['blog_user:read'])]
-        public ?string $id = null,
-        #[Groups(['blog_user:read', 'blog:read'])]
-        public ?BlogUserRole $role = null,
-        #[Groups(['blog_user:read'])]
         public ?int $blogId = null,
+        #[ApiProperty(identifier: true)]
         #[Groups(['blog_user:read'])]
         public ?int $userId = null,
+        #[Groups(['blog_user:read', 'blog:read'])]
+        public ?BlogUserRole $role = null,
     ) {
     }
 }

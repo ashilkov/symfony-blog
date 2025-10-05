@@ -65,8 +65,9 @@ readonly class BlogAssembler implements AssemblerInterface
             throw new \InvalidArgumentException('Entity must be an instance of Blog');
         }
         $doctrineEntity = $existingEntity ?? new DoctrineEntity();
-
-        $doctrineEntity->id = $entity->getId()?->value();
+        if (null === $doctrineEntity->id) {
+            $doctrineEntity->id = $entity->getId()?->value();
+        }
         $doctrineEntity->name = $entity->getName()->value();
         $doctrineEntity->description = $entity->getDescription()->value();
         $doctrineEntity->createdAt = $entity->getCreatedAt();
@@ -86,7 +87,7 @@ readonly class BlogAssembler implements AssemblerInterface
                 $doctrineEntity->blogUsers->add(
                     $this->entityManager->getReference(
                         BlogUser::class,
-                        ['blogId' => $blogUser->getBlogId()->value(), 'userId' => $blogUser->getUserId()->value()]
+                        ['blog' => $blogUser->getBlogId()->value(), 'userId' => $blogUser->getUserId()->value()]
                     )
                 );
             }

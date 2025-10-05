@@ -78,7 +78,6 @@ abstract class AbstractRepository extends ServiceEntityRepository
             $existing = parent::find($entity->getId()->value());
         }
         $doctrineEntity = $this->entityAssembler->toDoctrineEntity($entity, $existing);
-
         $this->entityManager->remove($doctrineEntity);
         if ($flush) {
             $this->entityManager->flush();
