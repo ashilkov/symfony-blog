@@ -63,6 +63,6 @@ readonly class UploadImageResolver
         $publicUrl = '/uploads/'.$filename;
 
         // Use a synthetic identifier (e.g., the filename or the public URL)
-        return new UploadResult(id: $filename, url: $publicUrl);
+        return new UploadResult(id: 0, url: $publicUrl);
     }
 }

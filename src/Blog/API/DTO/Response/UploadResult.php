@@ -18,10 +18,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
     shortName: 'Image',
-    /* todo: find better way to set iri for the DTO */
-    operations: [
-        new Get(uriTemplate: '/images/{id}', security: false),
-    ],
+    operations: [],
     normalizationContext: ['groups' => ['upload:read']],
     denormalizationContext: ['groups' => ['upload:write']],
     graphQlOperations: [
@@ -41,9 +38,9 @@ readonly class UploadResult
     public function __construct(
         #[ApiProperty(identifier: true)]
         #[Groups(['upload:read'])]
-        public string $id,
+        public ?int $id = null,
         #[Groups(['upload:read'])]
-        public string $url,
+        public ?string $url = null,
     ) {
     }
 }
