@@ -45,9 +45,7 @@ readonly class UpdateProcessor implements ProcessorInterface
 
         $post = ($this->handler)($command);
 
-        $resource = $this->postHydrator->hydrate($post);
-        $resource->blog = $this->blogHydrator->hydrate($post->getBlog());
-
-        return $resource;
+        // The post hydrator should handle hydrating the entire PostResource, including the blog
+        return $this->postHydrator->hydrate($post);
     }
 }

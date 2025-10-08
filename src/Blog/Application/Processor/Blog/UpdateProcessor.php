@@ -33,6 +33,11 @@ readonly class UpdateProcessor implements ProcessorInterface
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): BlogResource
     {
+        // Check if data is null first
+        if (null === $data) {
+            throw new \InvalidArgumentException('Blog data is required for update.');
+        }
+
         // Resolve ID from either REST or GraphQL paths
         $id = $uriVariables['blog_id'] ?? $uriVariables['id'] ?? $data->id ?? null;
         if (null === $id) {
@@ -48,11 +53,20 @@ readonly class UpdateProcessor implements ProcessorInterface
         $blog = ($this->handler)($command);
 
         $resource = $this->blogHydrator->hydrate($blog);
-        $resource->posts = array_map(fn ($post) => $this->postHydrator->hydrate($post), $blog->getPosts()->toArray());
-        $resource->blogUsers = array_map(
-            fn ($blogUser) => $this->blogUserHydrator->hydrate($blogUser),
-            $blog->getBlogUsers()->toArray()
-        );
+        
+        // Handle posts - convert iterator to array
+        $posts = [];
+        foreach ($blog->getPosts() as $post) {
+            $posts[] = $this->postHydrator->hydrate($post);
+        }
+        $resource->posts = $posts;
+        
+        // Handle blog users - convert iterator to array
+        $blogUsers = [];
+        foreach ($blog->getBlogUsers() as $blogUser) {
+            $blogUsers[] = $this->blogUserHydrator->hydrate($blogUser);
+        }
+        $resource->blogUsers = $blogUsers;
 
         return $resource;
     }
