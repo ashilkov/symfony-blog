@@ -34,16 +34,16 @@ readonly class CreateHandler
     public function __invoke(CreateCommand $command): Post
     {
         if (null === $command->userId) {
-            throw new \LogicException('User is required to create a blog.');
+            throw new \LogicException('User is required to create a post.');
         }
 
         $user = $this->userReadModel->findSummaryById($command->userId);
         if (null === $user) {
-            throw new \LogicException('User is required to create a blog.');
+            throw new \LogicException('User is required to create a post.');
         }
 
         /** @var Blog $blog */
-        $blog = $this->blogs->find($command->blogId);
+        $blog = $this->blogs->findOneBy(['id' => $command->blogId]);
         if (null === $blog) {
             throw new \LogicException('Blog is required to create a post.');
         }

@@ -47,11 +47,26 @@ class Content implements ValueInterface
 
     private static function normalize(string $value): string
     {
-        // Trim and collapse excessive whitespace; adapt to your needs
+        // Trim the entire string
         $v = trim($value);
-        $v = preg_replace('/\R/u', "\n", $v) ?? $v; // normalize newlines
-
-        // collapse spaces but keep newlines
-        return preg_replace('/[^\S\n]+/u', ' ', $v) ?? $v;
+        // Normalize all line endings to \n
+        $v = preg_replace('/\R/u', "\n", $v) ?? $v;
+        
+        // Split by lines to process each line individually
+        $lines = explode("\n", $v);
+        $normalizedLines = [];
+        foreach ($lines as $line) {
+            // Collapse multiple spaces within each line
+            $normalizedLine = preg_replace('/\s+/u', ' ', $line) ?? $line;
+            // Trim each line
+            $normalizedLine = trim($normalizedLine);
+            // Only add non-empty lines
+            if ($normalizedLine !== '') {
+                $normalizedLines[] = $normalizedLine;
+            }
+        }
+        
+        // Join lines back together
+        return implode("\n", $normalizedLines);
     }
 }

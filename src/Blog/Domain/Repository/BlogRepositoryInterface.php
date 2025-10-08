@@ -5,7 +5,10 @@ namespace App\Blog\Domain\Repository;
 use App\Blog\Domain\Model\Blog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
 
-interface BlogRepositoryInterface extends ServiceEntityRepositoryInterface
+/**
+ * @extends ServiceEntityRepositoryInterface<Blog>
+ */
+interface BlogRepositoryInterface extends ServiceEntityRepositoryInterface, RepositoryInterface
 {
     public function save(Blog $entity, bool $flush = false): void;
 

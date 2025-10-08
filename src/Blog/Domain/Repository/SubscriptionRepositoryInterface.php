@@ -12,7 +12,7 @@ namespace App\Blog\Domain\Repository;
 use App\Blog\Domain\Model\Subscription;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
 
-interface SubscriptionRepositoryInterface extends ServiceEntityRepositoryInterface
+interface SubscriptionRepositoryInterface extends ServiceEntityRepositoryInterface, RepositoryInterface
 {
     public function save(Subscription $entity, bool $flush = false): void;
 
